@@ -71,7 +71,7 @@ async def process_data_in_batches(data_list, args, batch_size, url, headers):
 def process_response_data(results):
     all_rows = []
     headers_excel = ['response_status_code', 'response_text', 'content', 'field', 'item', 'standard', 'check_quality',
-                     'auto_modify_type', 'auto_modify_info', 'check_quality_detaile','amend_advice']
+                     'auto_modify_type', 'auto_modify_info', 'check_quality_detaile','amend_advice', "field_path", "error_segment_list"]
     input_base_medical_head = ['chief_complaint', 'history_of_present_illness', 'past_medical_history',
                                'personal_history', 'allergy_history', 'physical_examination', 'auxiliary_examination']
     input_physical_examination_head = ['temperature', 'pulse', 'blood_pressure', 'respiration']
@@ -110,7 +110,9 @@ def process_response_data(results):
                 response_info['auto_modify_type'],
                 response_info['auto_modify_info'],
                 response_info['check_quality_detaile'],
-                response_info['amend_advice']
+                response_info['amend_advice'],
+                response_info['field_path'],
+                response_info['error_segment_list']
             ]
             all_rows.append(row)
 
