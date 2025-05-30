@@ -17,6 +17,8 @@ from pydantic import BaseModel, Field
 from fastapi import FastAPI, Body
 from typing_extensions import Annotated
 
+RecursiveDict = Dict[str, Union['RecursiveDict', str, int, float, bool, None]]
+
 class PhyscialExamination(BaseModel):
     temperature: str
     pulse: str
