@@ -59,6 +59,7 @@ def args_parser():
     parser.add_argument('--fastbm25-path', type=str, default="../data/processed/fastbm25", help='fastbm25 data')
     parser.add_argument('--log', action='store_true', help='If True, save log to ./medical_xxx.log.')
     parser.add_argument('--max-round', type=int, default=30, help='The maximum number of conversations.')
+    parser.add_argument('--max-tokens', type=int, default=2048, help='Maximum number of tokens to generate per output sequence.')
     parser.add_argument("--host", type=str, required=True)
     parser.add_argument("--port", type=int, default=8001)
     parser.add_argument('--quality', type=str, default="../data/raw/json/quality/quality.json", help='quality data')
@@ -68,7 +69,15 @@ def args_parser():
     return args
 
 
+def quality_config_init():
+    g_quality_configs = QualityConfigs(args.quality)
+    g_async_client = AsyncOpenAI(api_key = args.api_key, base_url = args.model_url)
+
+
 app = FastAPI()
+args = args_parser()
+g_quality_configs = QualityConfigs(args.quality)
+g_async_client = AsyncOpenAI(api_key = args.api_key, base_url = args.model_url)
 
 
 def thread_pool_executor(requestv, *receive, **kreceive):
@@ -111,21 +120,14 @@ async def follow_up_questionnaire(request_input: FollowUpAPIRequest, args=Depend
 async def qulity_inspect(
    input_request_input: QualityAPIRequestInput
 ):
-    args = args_parser()
-    OPENAI_API_KEY = "EMPTY"
-    input_request = input_request_input.input
-    g_quality_configs = QualityConfigs(args.quality)
-    QUALITY_SETTINGS = handle_quality(args.quality)
-    g_async_client = AsyncOpenAI(api_key = OPENAI_API_KEY, base_url = args.model_url)
-
-    
+    input_request = input_request_input.input  
     if input_request.control_quality_config_name is not None:
         quality_config_real = g_quality_configs.get_quality_config_by_name(input_request.control_quality_config_name)
         if quality_config_real is None:
             raise HTTPException(status_code=400, detail=f"config_name {input_request.control_quality_config_name} not found")
     else:
         quality_config_real = g_quality_configs.get_default_quality_config()
-    quality_inspect = QualityInspect(input_request, quality_config_real, OPENAI_API_KEY, args.model_url, args.model, async_client=g_async_client)
+    quality_inspect = QualityInspect(input_request, quality_config_real, args.api_key, args.model_url, args.model, async_client=g_async_client)
     results = await quality_inspect.async_process_queries()
     json_compatible_data = jsonable_encoder(results, exclude_none = True)
     return JSONResponse(content=json_compatible_data)    
@@ -135,17 +137,13 @@ async def qulity_inspect(
 async def qulity_modify(
    input_request_input: QualityAPIRequestInput
 ):
-    args = args_parser()
-    OPENAI_API_KEY = "EMPTY"
     input_request = input_request_input.input
     input_chat = input_request_input.chat
     historical_conversations = None
-    QUALITY_SETTINGS = handle_quality(args.quality)
-    g_async_client = AsyncOpenAI(api_key = OPENAI_API_KEY, base_url = args.model_url)
 
     if input_chat:
         historical_conversations = input_chat.historical_conversations
-    quality_modify = QualityModify(input_request, historical_conversations, OPENAI_API_KEY, args.model_url, args.model, async_client=g_async_client)
+    quality_modify = QualityModify(input_request, historical_conversations, args.api_key, args.model_url, args.model, async_client=g_async_client, prompt_conf = get_config())
     results = await quality_modify.async_process_queries()
     json_compatible_data = jsonable_encoder(results, exclude_none = True)
     return JSONResponse(content=json_compatible_data)
@@ -190,6 +188,7 @@ log_name = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 async def startup_event():
     args = args_parser()
     load_config()
+    quality_config_init()
 
 
 if __name__ == '__main__':

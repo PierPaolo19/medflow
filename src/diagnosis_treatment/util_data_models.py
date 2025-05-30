@@ -236,29 +236,15 @@ class RequestV5(BaseModel):
 
 
 # v6  zh: zhi liao fang an, therapy scheme
+class TherapyFields(BaseModel):
+    field_id: str
+    field_name: str
+
 class InputV6(BaseModel):
     client_info: Union[List[ClientInfo], List[None]]
     basic_medical_record: BasicMedicalRecord
     diagnosis: List[Diagnosis]
-
-class PickTherapy(BaseModel):
-    picked_therapy: str
-    interpret_therapy: str
-
-class MethodTherapyContent(BaseModel):
-    method_code: str
-    method_type: str
-    method_name: str
-    method_name_retrieve: str
-    corresponding_diseases: str
-    method_plan: str
-    method_risk: str
-
-class MethodTherapy(BaseModel):
-    methodtherapy_content: List[MethodTherapyContent]
-
-class BasicTherapy(BaseModel):
-    method: List[MethodTherapy] = Field(default_factory=list)
+    therapy_fields: List[TherapyFields]
 
 class PrescriptionContent(BaseModel):
     drug_id: str
@@ -298,22 +284,48 @@ class DispositionContent(BaseModel):
 class Disposition(BaseModel):
     disposition_content: List[DispositionContent]
 
-class DefaultTherapy(BaseModel):
-    prescription: List[Prescription] = Field(default_factory=list)
-    transfusion: List[Transfusion] = Field(default_factory=list)
-    disposition: List[Disposition] = Field(default_factory=list)
+
+class TherapyInterpret(BaseModel):
+    therapy_name: str
+    therapy_content: str
+
+class PickTherapy(BaseModel):
+    therapy_name: str
+    therapy_summary: str
+    therapy_interpret: List[TherapyInterpret]
+
+
+class MethodTherapyContent(BaseModel):
+    method_code: str
+    method_type: str
+    method_name: str
+    method_name_retrieve: str
+    corresponding_diseases: str
+    method_plan: str
+    method_risk: str
+
+class TherapyContent(BaseModel):
+    prescription: List[PrescriptionContent] = Field(default_factory=list)
+    transfusion: List[TransfusionContent] = Field(default_factory=list)
+    disposition: List[DispositionContent] = Field(default_factory=list)
+    examine: List[ExamineContent] = Field(default_factory=list)
+    assay: List[AssayContent] = Field(default_factory=list)
+    surgical: List[MethodTherapyContent] = Field(default_factory=list)
+    chemo: List[MethodTherapyContent] = Field(default_factory=list)
+    radiation: List[MethodTherapyContent] = Field(default_factory=list)
+    psycho: List[MethodTherapyContent] = Field(default_factory=list)
+    rehabilitation: List[MethodTherapyContent] = Field(default_factory=list)
+    physical: List[MethodTherapyContent] = Field(default_factory=list)
+    alternative: List[MethodTherapyContent] = Field(default_factory=list)
+    observation: List[MethodTherapyContent] = Field(default_factory=list)
+
+class GenerateTherapy(BaseModel):
+    therapy_name: str = ""
+    therapy_content: TherapyContent = Field(default_factory=lambda: TherapyContent())
 
 class OutputV6(BaseModel):
     pick_therapy: List[PickTherapy] = Field(default_factory=list)
-    default_therapy: DefaultTherapy = Field(default_factory=DefaultTherapy)
-    surgical_therapy: BasicTherapy = Field(default_factory=BasicTherapy)
-    chemo_therapy: BasicTherapy = Field(default_factory=BasicTherapy)
-    radiation_therapy: BasicTherapy = Field(default_factory=BasicTherapy)
-    psycho_therapy: BasicTherapy = Field(default_factory=BasicTherapy)
-    rehabilitation_therapy: BasicTherapy = Field(default_factory=BasicTherapy)
-    physical_therapy: BasicTherapy = Field(default_factory=BasicTherapy)
-    alternative_therapy: BasicTherapy = Field(default_factory=BasicTherapy)
-    observation_therapy: BasicTherapy = Field(default_factory=BasicTherapy)
+    generate_therapy: List[GenerateTherapy] = Field(default_factory=lambda: [GenerateTherapy()])
 
 class RequestV6(BaseModel):
     input: InputV6
@@ -341,13 +353,18 @@ class RequestV7(BaseModel):
 
 
 # v8  zh: dao zhen, hospital guide
+class Department2(BaseModel):
+    department_id: str
+    department_name: str
+    if_child: bool
+
 class InputV8(BaseModel):
     client_info: List[ClientInfo]
-    all_department: List[Department] | None = None
+    all_department: List[Department2] | None = None
 
 class OutputV8(BaseModel):
     basic_medical_record: BasicMedicalRecord
-    chosen_department: List[Department]
+    chosen_department: List[Department2]
 
 class RequestV8(BaseModel):
     input: InputV8

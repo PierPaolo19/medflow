@@ -1,0 +1,227 @@
+{
+    "input": {
+        "client_info": [
+            {
+                "patient": {
+                    "patient_name": "张三",
+                    "patient_gender": "女",
+                    "patient_age": "76",
+                    "if_child": "否",
+                    "certificate_type": "",
+                    "certificate_number": "",
+                    "mobile_number": "",
+                    "current_address": {
+                        "province": "",
+                        "city": "",
+                        "district": "",
+                        "street": ""
+                    },
+                    "detailed_address": ""
+                },
+                "guardian": {
+                    "guardian_name": "",
+                    "certificate_type": "",
+                    "certificate_number": ""
+                }
+            }
+        ],
+        "basic_medical_record": {
+            "chief_complaint": "解黑便11小时",
+            "history_of_present_illness": "昨晚20时开始无明显诱因出现解黑便2次，呈黑色成形大便，每次量约100g，伴阵发性腹部隐痛，偶有头晕、出冷汗，有气促，无晕厥，无胸痛、胸闷，无呕吐，无发热",
+            "past_medical_history": "胃窦部溃疡伴出血、肺部感染、糜烂性胃炎、十二指肠炎、贫血、高血压病和腰椎退行性病变，骨质疏松，电解质紊乱，老年性心脏瓣膜病，高血压病史多年，长期服药治疗，否认糖尿病",
+            "personal_history": "否认吸烟、酗酒、或过度劳累等习惯",
+            "allergy_history": "否认药物和食物过敏史",
+            "physical_examination": {
+                "temperature": "36.5℃",
+                "pulse": "86次/分",
+                "blood_pressure": "150/61mmHg",
+                "respiration": "18次"
+            },
+            "auxiliary_examination": ""
+        },
+        "diagnosis": [
+            {
+                "diagnosis_name": "上消化道出血",
+                "diagnosis_name_retrieve": "上消化道出血",
+                "diagnosis_code": "K92.208",
+                "diagnosis_identifier": "确诊"
+            },
+            {
+                "diagnosis_name": "贫血",
+                "diagnosis_name_retrieve": "贫血",
+                "diagnosis_code": "D64.900",
+                "diagnosis_identifier": "确诊"
+            }
+        ],
+        "therapy_fields": [
+            {
+                "field_id": "prescription",
+                "field_name": "药物治疗"
+            },
+            {
+                "field_id": "transfusion",
+                "field_name": "输液"
+            },
+            {
+                "field_id": "disposition",
+                "field_name": "处置"
+            },
+            {
+                "field_id": "examine",
+                "field_name": "检查"
+            },
+            {
+                "field_id": "assay",
+                "field_name": "化验"
+            },
+            {
+                "field_id": "surgical",
+                "field_name": "手术治疗"
+            },
+            {
+                "field_id": "chemo",
+                "field_name": "化学治疗"
+            },
+            {
+                "field_id": "radiation",
+                "field_name": "放射治疗"
+            },
+            {
+                "field_id": "psycho",
+                "field_name": "心理治疗"
+            },
+            {
+                "field_id": "rehabilitation",
+                "field_name": "康复治疗"
+            },
+            {
+                "field_id": "physical",
+                "field_name": "物理治疗"
+            },
+            {
+                "field_id": "alternative",
+                "field_name": "替代疗法"
+            },
+            {
+                "field_id": "observation",
+                "field_name": "观察治疗"
+            }
+        ]
+    },
+    "output": {
+        "pick_therapy": [
+            {
+                "therapy_name": "方案一",
+                "therapy_summary": "本方案以药物治疗和输液为主，结合必要的检查和生命体征监测，旨在迅速控制上消化道出血，纠正贫血，维持生命体征稳定，并明确出血原因。适用于病情较重但尚未出现休克的患者。",
+                "therapy_interpret": [
+                    {
+                        "therapy_name": "药物治疗",
+                        "therapy_content": "给予质子泵抑制剂（如奥美拉唑）静脉滴注，以抑制胃酸分泌，保护胃黏膜；同时给予生长抑素类药物（如奥曲肽）控制出血。"
+                    },
+                    {
+                        "therapy_name": "输液",
+                        "therapy_content": "静脉输注平衡盐溶液（如乳酸林格液）以维持血容量，必要时输注红细胞悬液纠正贫血。"
+                    },
+                    {
+                        "therapy_name": "检查",
+                        "therapy_content": "进行胃镜检查以明确出血部位及原因，同时进行血常规、肝肾功能、电解质、凝血功能等实验室检查。"
+                    },
+                    {
+                        "therapy_name": "处置",
+                        "therapy_content": "监测生命体征，包括血压、心率、呼吸频率及意识状态，必要时吸氧。"
+                    }
+                ]
+            },
+            {
+                "therapy_name": "方案二",
+                "therapy_summary": "本方案适用于出血量较大、生命体征不稳定的患者，通过积极的药物和液体复苏，结合影像学检查，快速明确出血原因并控制出血，防止休克发生。",
+                "therapy_interpret": [
+                    {
+                        "therapy_name": "药物治疗",
+                        "therapy_content": "静脉给予质子泵抑制剂（如埃索美拉唑）和血管活性药物（如去甲肾上腺素）以控制出血并维持血压。"
+                    },
+                    {
+                        "therapy_name": "输液",
+                        "therapy_content": "快速输注晶体液（如生理盐水）和胶体液（如羟乙基淀粉）以维持有效循环血量，必要时输注红细胞。"
+                    },
+                    {
+                        "therapy_name": "检查",
+                        "therapy_content": "紧急进行胃镜检查，同时进行腹部CT或血管造影以评估出血来源及是否存在血管异常。"
+                    },
+                    {
+                        "therapy_name": "处置",
+                        "therapy_content": "建立两条静脉通路，持续监测生命体征，必要时转入ICU进行密切监护。"
+                    }
+                ]
+            },
+            {
+                "therapy_name": "方案三",
+                "therapy_summary": "本方案适用于内镜治疗无效或出血严重、危及生命的患者，通过手术直接止血，同时配合药物和液体治疗，以挽救生命并防止并发症。",
+                "therapy_interpret": [
+                    {
+                        "therapy_name": "手术治疗",
+                        "therapy_content": "若胃镜检查发现出血灶无法内镜下止血，或出血量大且持续，考虑进行外科手术（如胃大部切除术或血管结扎术）止血。"
+                    },
+                    {
+                        "therapy_name": "药物治疗",
+                        "therapy_content": "术前给予静脉质子泵抑制剂和血管活性药物，术后继续维持治疗。"
+                    },
+                    {
+                        "therapy_name": "输液",
+                        "therapy_content": "术前术后均需维持静脉输液，必要时输注红细胞和血浆以纠正贫血和维持血容量。"
+                    },
+                    {
+                        "therapy_name": "检查",
+                        "therapy_content": "术前进行血常规、凝血功能、心电图等检查，术后监测血红蛋白、电解质及肝肾功能。"
+                    }
+                ]
+            },
+            {
+                "therapy_name": "方案四",
+                "therapy_summary": "本方案适用于出血量小、症状轻微、生命体征稳定的患者，通过观察和基础治疗控制病情，避免不必要的侵入性操作，同时密切监测病情变化。",
+                "therapy_interpret": [
+                    {
+                        "therapy_name": "观察治疗",
+                        "therapy_content": "若患者出血量小、生命体征稳定，可暂不进行侵入性治疗，密切观察黑便次数、颜色及伴随症状变化。"
+                    },
+                    {
+                        "therapy_name": "药物治疗",
+                        "therapy_content": "口服或静脉给予质子泵抑制剂，预防进一步出血。"
+                    },
+                    {
+                        "therapy_name": "检查",
+                        "therapy_content": "进行血常规、大便潜血试验、肝肾功能等检查，评估贫血程度及出血情况。"
+                    },
+                    {
+                        "therapy_name": "处置",
+                        "therapy_content": "监测生命体征，嘱患者卧床休息，避免剧烈活动，保持大便通畅。"
+                    }
+                ]
+            }
+        ],
+        "generate_therapy": [
+            {
+                "therapy_name": "",
+                "therapy_content": {
+                    "prescription": [],
+                    "transfusion": [],
+                    "disposition": [],
+                    "examine": [],
+                    "assay": [],
+                    "surgical": [],
+                    "chemo": [],
+                    "radiation": [],
+                    "psycho": [],
+                    "rehabilitation": [],
+                    "physical": [],
+                    "alternative": [],
+                    "observation": []
+                }
+            }
+        ]
+    },
+    "chat": {
+        "historical_conversations_bak": [],
+        "historical_conversations": []
+    }
+}

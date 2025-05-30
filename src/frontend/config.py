@@ -16,15 +16,15 @@ import argparse
 
 prompt_versions = {
     "distribute": ["v1", "v2"],
-    "clientinfo": ["v1", "v2", "v3", "v4"],
-    "basicmedicalrecord": ["v1", "v2", "v3", "v4"],
-    "hospitalregister": ["v1", "v2", "v3", "v4", "v5"],
+    "clientinfo": ["v1", "v2", "v3", "v4", "v5"],
+    "basicmedicalrecord": ["v1", "v2", "v3", "v4", "v5"],
+    "hospitalregister": ["v1", "v2", "v3", "v4", "v5", "v6"],
     "diagnosis": ["v1", "v2"],
     "examass": ["v1", "v2"],
-    "scheme": ["v1", "v2"],
+    "scheme": ["v1", "v2", "v3", "v4"],
     "returnvisit": ["v1", "v2"],
-    "hospitalguide": ["v1", "v2"],
-    "doctormedicalrecord": ["v1", "v2"],
+    "hospitalguide": ["v1", "v2", "v3", "v4"],
+    "doctormedicalrecord": ["v1", "v2", "v3"],
     "quality_inspect": ["v1", "v2"],
     "quality_modify": ["v1", "v2"]
 }

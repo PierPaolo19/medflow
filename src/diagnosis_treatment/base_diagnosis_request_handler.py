@@ -117,7 +117,7 @@ class BaseDiagnosisRequestHandler(ABC):
                             round = k + 1
                             if (round >= 11) and ((round+1) % 6 == 0):
                                 messages[round]['content'] = messages[round]['content'].replace(single_add_prompt, '') + irrelevant_content
-            case 14|15|1|2:
+            case 14|15|1|2|8:
                 for item in infer_hc:
                     messages.append({'role': item.role, 'content': item.content})
                 for item in messages:
@@ -135,7 +135,7 @@ class BaseDiagnosisRequestHandler(ABC):
                             round = k + 1
                             if ((round+1) % 6 == 0):
                                 messages[round]['content'] = messages[round]['content'].replace(single_add_prompt, '') + irrelevant_content
-            case 8:
+            case 81:
                 for item in infer_hc:
                     if item.role == "user":
                         messages.append({'role': item.role, 'content': item.content + single_add_prompt})
@@ -183,7 +183,7 @@ class BaseDiagnosisRequestHandler(ABC):
             messages=messages,
             temperature=temp,
             top_p=top_p,
-            max_tokens=1024,#8192
+            max_tokens=self.args.max_tokens,
             stream=False,#True
             stop="<|eot_id|>",
         )
@@ -204,7 +204,7 @@ class BaseDiagnosisRequestHandler(ABC):
             messages=messages,
             temperature=temp,
             top_p=top_p,
-            max_tokens=1024,
+            max_tokens=self.args.max_tokens,
             stream=True,
             stop="<|eot_id|>",
         )
@@ -219,11 +219,11 @@ class BaseDiagnosisRequestHandler(ABC):
         self.checker_flag()
 
         messages = []
-        if self.request_type != "v3":
+        if self.request_type not in ["v3", "v6"]:
             self.generate_prompt()
             messages = self.preprocess(self.receive, self.prompt, self.flag)
 
-        if self.request_type in ["v0", "v1", "v2", "v3", "v7", "v8"]:
+        if self.request_type in ["v0", "v1", "v2", "v3", "v6", "v7", "v8"]:
             self.results = self.postprocess(messages)
         else:
             answer = self.predict(messages, self.temprature, self.top_p)

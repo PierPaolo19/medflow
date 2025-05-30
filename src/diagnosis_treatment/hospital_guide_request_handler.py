@@ -26,10 +26,15 @@ from fastapi import HTTPException
 
 class HospitalGuideProcessChecker:
     def __init__(self, receive) -> None:
-        pass
+        self.bmr = receive.output.basic_medical_record
+
+    def __check_chief_complaint(self):
+        return any(getattr(self.bmr, attr) in ["", None] for attr in
+            ['chief_complaint', 'history_of_present_illness', 'past_medical_history', 'personal_history', 'allergy_history'])
 
     def check(self) -> int:
-        return 8
+        if self.__check_chief_complaint(): return 81
+        else: return 8
 
 class HospitalGuideRequestHandler(BaseDiagnosisRequestHandler):
     def __init__(self,
@@ -99,19 +104,22 @@ class HospitalGuideRequestHandler(BaseDiagnosisRequestHandler):
 
                 if '推荐科室' in json_data and json_data['推荐科室']:
                     department_item = []
-                    all_department = [{"department_id":v.department_id, "department_name":v.department_name} for v in self.receive.input.all_department]
+                    all_department = [{"department_id":v.department_id, "department_name":v.department_name, "if_child":v.if_child}
+                                      for v in self.receive.input.all_department]
                     for item in json_data['推荐科室']:
                         query_item = item['科室名称']
                         search_result = list(filter(lambda item: query_item in item['department_name'], all_department))
                         if search_result:
-                            department_item.append(Department(
+                            department_item.append(Department2(
                                 department_id=search_result[0]['department_id'],
-                                department_name=search_result[0]['department_name']
+                                department_name=search_result[0]['department_name'],
+                                if_child=search_result[0]['if_child']
                             ))
                         else:
-                            department_item.append(Department(
+                            department_item.append(Department2(
                                 department_id=item['科室编号'],
-                                department_name=item['科室名称']
+                                department_name=item['科室名称'],
+                                if_child=1 if item['是否儿科'] == "是" else 0
                             ))
                     params.output.chosen_department = department_item
                     answer = self.format_department(json_data, text_match)

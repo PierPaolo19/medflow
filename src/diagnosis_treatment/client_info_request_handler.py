@@ -171,6 +171,8 @@ class ClientInfoRequestHandler(BaseDiagnosisRequestHandler):
                 if json_data_p['姓名'] != "":
                     params.output.client_info[0].patient.patient_name = json_data_p['姓名']
                     if flag != 1: params.output.create_file = "是"
+                else:
+                    count_answer.append("未提供患者的姓名。")
 
                 if json_data_p['证件号码'] != "":
                     if json_data_p['证件类型'] in ['身份证', '居住证', '大陆居民身份证', '大陆居民身份证(二代)', '大陆居民身份证(一代)', '港澳居民居住证', '台湾居民居住证']:
@@ -204,28 +206,41 @@ class ClientInfoRequestHandler(BaseDiagnosisRequestHandler):
                                 params.output.client_info[0].guardian.certificate_type = ""
                                 params.output.client_info[0].guardian.certificate_number = ""
                     else:
-                        params.output.client_info[0].patient.certificate_type = json_data_p['证件类型']
-                        params.output.client_info[0].patient.certificate_number = json_data_p['证件号码']
-
-                        if flag != 12:
-                            if json_data_p['性别'] != "":
-                                if json_data_p['性别'] in ['男', '女']:
-                                    params.output.client_info[0].patient.patient_gender = json_data_p['性别']
-                                else:
-                                    count_answer.append("患者性别错误，应为“男/女”。")
-
-                            if json_data_p['出生日期']['年'] != "" and json_data_p['出生日期']['月'] != "" and json_data_p['出生日期']['日'] != "":
-                                age = self.calculate_age(json_data_p)
-                                if age > 0 and age < 120:
-                                    params.output.client_info[0].patient.if_child = "是" if age < 15 else "否"
-                                    params.output.client_info[0].patient.patient_age = str(age)
-                                else:
-                                    count_answer.append("出生日期错误，年龄应介于1岁到120岁之间。")
-
-                                if params.output.client_info[0].patient.if_child == "否":
-                                    params.output.client_info[0].guardian.guardian_name = "无"
-                                    params.output.client_info[0].guardian.certificate_type = "无"
-                                    params.output.client_info[0].guardian.certificate_number = "无"
+                        if params.output.client_info[0].patient.certificate_number == json_data_p['证件号码']:
+                            params.output.client_info[0].patient.certificate_type = json_data_p['证件类型']
+                            params.output.client_info[0].patient.certificate_number = json_data_p['证件号码']
+                            if flag != 12:
+                                if json_data_p['性别'] != "":
+                                    if json_data_p['性别'] in ['男', '女']:
+                                        params.output.client_info[0].patient.patient_gender = json_data_p['性别']
+                                    else:
+                                        count_answer.append("患者性别错误，应为“男/女”。")
+                                if json_data_p['出生日期']['年'] != "" and json_data_p['出生日期']['月'] != "" and json_data_p['出生日期']['日'] != "":
+                                    age = self.calculate_age(json_data_p)
+                                    if age > 0 and age < 120:
+                                        params.output.client_info[0].patient.if_child = "是" if age < 15 else "否"
+                                        params.output.client_info[0].patient.patient_age = str(age)
+                                    else:
+                                        count_answer.append("出生日期错误，年龄应介于1岁到120岁之间。")
+                                    if params.output.client_info[0].patient.if_child == "否":
+                                        params.output.client_info[0].guardian.guardian_name = "无"
+                                        params.output.client_info[0].guardian.certificate_type = "无"
+                                        params.output.client_info[0].guardian.certificate_number = "无"
+                                    if params.output.client_info[0].patient.if_child == "是":
+                                        params.output.client_info[0].guardian.guardian_name = ""
+                                        params.output.client_info[0].guardian.certificate_type = ""
+                                        params.output.client_info[0].guardian.certificate_number = ""
+                        else:
+                            params.output.client_info[0].patient.if_child = ""
+                            params.output.client_info[0].patient.patient_gender = ""
+                            params.output.client_info[0].patient.patient_age = ""
+                            params.output.client_info[0].guardian.guardian_name = ""
+                            params.output.client_info[0].guardian.certificate_type = ""
+                            params.output.client_info[0].guardian.certificate_number = ""
+                            params.output.client_info[0].patient.certificate_type = json_data_p['证件类型']
+                            params.output.client_info[0].patient.certificate_number = json_data_p['证件号码']
+                else:
+                    count_answer.append("未提供患者的证件类型和证件号码。")
 
                 if json_data_p['手机号码'] != "":
                     pattern = r"^\d{11}$"
@@ -236,6 +251,8 @@ class ClientInfoRequestHandler(BaseDiagnosisRequestHandler):
                         count_answer.append("手机号码固定开头错误。")
                     else:
                         params.output.client_info[0].patient.mobile_number = json_data_p['手机号码']
+                else:
+                    count_answer.append("未提供患者的手机号码。")
 
                 wait_check = json_data_p['所居区域']['省'] + json_data_p['所居区域']['市'] + json_data_p['所居区域']['区'] + json_data_p['所居区域']['街道']
                 if wait_check != "":
@@ -253,14 +270,18 @@ class ClientInfoRequestHandler(BaseDiagnosisRequestHandler):
                         count_answer.append("“区”填写错误或漏填。")
                     if params.output.client_info[0].patient.current_address.street == "":
                         count_answer.append("“街道”填写错误或漏填。")
+                else:
+                    count_answer.append("未提供患者的所居区域。")
 
                 if json_data_p['详细地址'] != "":
                     params.output.client_info[0].patient.detailed_address = json_data_p['详细地址']
+                else:
+                    count_answer.append("未提供患者的详细地址。")
 
-                if json_data_g['姓名'] != "":
+                if json_data_g['姓名'] not in ["", "无"]:
                     params.output.client_info[0].guardian.guardian_name = json_data_g['姓名']
 
-                if json_data_g['证件号码'] != "":
+                if json_data_g['证件号码'] not in ["", "无"]:
                     if json_data_g['证件类型'] in ['身份证', '居住证', '大陆居民身份证', '大陆居民身份证(二代)', '大陆居民身份证(一代)', '港澳居民居住证', '台湾居民居住证']:
                         if_valid = validator.is_valid(json_data_g['证件号码'])
                         if if_valid == 0:

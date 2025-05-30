@@ -81,9 +81,13 @@ def query_fastbm25(database_url, query_item: str, engine_flag: str):
         flag = character_percentage(query_item, results[0][0])
     return results if flag else None
 
-def department_introduction(department_path):
+def department_introduction(department_path, if_child: bool = 0):
     with open(department_path, "r") as f:
         all_department = json.load(f)
-    department_intro = [{item['department_name']: item['introduction']} for item in all_department['all_department']
-        if item['introduction'] != ""]
+    if if_child == 0:
+        department_intro = [{item['department_name']: item['introduction']} for item in all_department['all_department']
+            if (item['introduction'] != "" and item['if_child'] == 0)]
+    else:
+        department_intro = [{item['department_name']: item['introduction']} for item in all_department['all_department']
+            if (item['introduction'] != "" and item['if_child'] == 1)]
     return department_intro
