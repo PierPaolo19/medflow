@@ -16,13 +16,15 @@ import re
 import json
 from bs4 import BeautifulSoup
 from ..prompt_template import *
-from ..util_data_models import DoctorMedicalRecord, PhyscialExamination
+from ..util_data_models import DoctorMedicalRecord
 from fastapi import HTTPException
 
 @register_prompt
-class PromptDoctorMedicalRecord_v1(PromptTemplate):
+class PromptDoctorMedicalRecord_v3(PromptTemplate):
     def __init__(self, receive, scheme) -> None:
         super().__init__()
+        self.yaml_name = "doctormedicalrecord_v3.yaml"
+        self.prompt_manager = PromptManager(self.yaml_name)
         self.medical_templet = receive.input.medical_templet
         self.templet_type = receive.input.templet_type
         self.doctor_supplement = receive.input.doctor_supplement
@@ -106,66 +108,20 @@ class PromptDoctorMedicalRecord_v1(PromptTemplate):
                     for k, v in value.items(): medical += f"  {self.reversed_sub_medical_fields.get(k)}：{v}\n"
                     medical_json.update({self.reversed_medical_fields.get(key): {self.reversed_sub_medical_fields.get(k): "" for k in value.keys()}})
 
+        self.variables = {
+            "doctor_supplement": self.doctor_supplement,
+            "medical": medical,
+            "medical_json": medical_json
+        }
         match self.scheme:
             case "general":
-                system_str=f"""#Role:
-专业医生
-## Profile
--description: 你是一个优秀的专业医生，主要工作是按任务要求对病历进行补充或修改，并以json格式返回重新生成的病历。
-## Skills
-1.具备扎实的医疗知识，掌握病历书写的标准规则。
-2.主诉只需要填写最主要的症状和持续时间即可，不要超过10个字。
-3.现病史需要填写患者本次患病后全过程，包括发生、发展和诊治经过。如果患者表示没有某种症状时，记录为“否认xxx”，注意不要遗漏任何细节。
-4.对于任务中未涉及的内容，记录为空字符串。
-## MedicalRecord 
-{medical}
-## Tasks
--任务要求：“{self.doctor_supplement}”
-## Initialization:
-作为<Role>，任务为<Profile>，拥有<Skills>技能，待修改的病历为<MedicalRecord>，按<Tasks>中的任务要求对病历进行修改，\
-并严格按照json格式返回，例如：
-{medical_json}。
-重新生成病历时先说“现在为您返回修改后的病历：”。
-注意，<Tasks>中的描述通常会是口语化描述，你需要将口语化的描述转换成简洁、正式、专业的医学术语。"""
+                system_str = self.prompt_manager.get_prompt("general", 0, self.variables)
             case "special":
-                system_str=f"""#Role:
-专业医生
-
-## Profile
-你是一个优秀的专业医生，主要工作是按任务要求中的描述填写病历记录，病历记录采取下面的病历模板，只能修改括号里的内容，括号需要保留。\
-请完全理解任务要求中描述内容后填写并输出，不要遗漏任何细节。注意纠正可能的语音识别错误。数值都采用阿拉伯数字表示。
-
-## Template
-{medical}
-
-## Tasks
--任务要求：“{self.doctor_supplement}”
-
-## Initialization:
-作为<Role>，任务为<Profile>，病历模板为<Template>，按<Tasks>中的任务要求对病历模板进行补充，并严格按照json格式返回，例如：
-{medical_json}。
-返回补充完的病历时先说“现在为您返回补充后的病历：”。
-注意，返回的病历中要保留括号。"""
+                system_str = self.prompt_manager.get_prompt("special", 0, self.variables)
+            case "special_modify":
+                system_str = self.prompt_manager.get_prompt("special", 0, self.variables)
             case "special_select":
-                system_str=f"""#Role:
-专业医生
-
-## Profile
-你是一个优秀的专业医生，主要工作是按任务要求中的描述填写病历记录，病历记录采取下面的病历模板，只能修改括号里的内容，括号需要保留。\
-如果括号中已经填写了内容，代表是选择题，你需要按照任务要求中的描述，挑选出一个进行填空，注意，括号中只能保留一个。\
-请完全理解任务要求中描述内容后填写并输出，不要遗漏任何细节。注意纠正可能的语音识别错误。数值都采用阿拉伯数字表示。
-
-## Template
-{medical}
-
-## Tasks
--任务要求：“{self.doctor_supplement}”
-
-## Initialization:
-作为<Role>，任务为<Profile>，病历模板为<Template>，按<Tasks>中的任务要求对病历模板进行补充，并严格按照json格式返回，例如：
-{medical_json}。
-返回补充完的病历时先说“现在为您返回补充后的病历：”。
-注意，返回的病历中要保留括号。"""
+                system_str = self.prompt_manager.get_prompt("special_select", 0, self.variables)
             case _:
-                raise HTTPException(status_code=400, detail=f"Invalid Parameter: scheme must be equal to general, special or special_select.")
+                raise HTTPException(status_code=400, detail=f"Invalid Parameter: scheme must be equal to general, special, special_modify or special_select.")
         return system_str, None
