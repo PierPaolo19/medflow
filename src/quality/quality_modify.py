@@ -33,7 +33,7 @@ class QualityModify:
         openai_api_key: str,
         openai_api_base: str,
         model_name : str,
-        async_client : AsyncOpenAI | None,
+        async_client : AsyncOpenAI | None = None,
     ):
         self.input_request = input_request
         self.openai_api_key = openai_api_key
@@ -106,7 +106,7 @@ class QualityModify:
         if self.control_quality is None or len(self.control_quality) == 0:
             return self.QUALITY_NO_ABNORM
         
-        problem_list = [(item.item + "  " + item.check_quality_detaile) for item in self.control_quality if item.check_quality != "" and "无异常" not in item.check_quality]
+        problem_list = [(item.item + "  " + (item.check_quality_detaile or "")) for item in self.control_quality if item.check_quality != "" and "无异常" not in item.check_quality]
         problem_dict = dict()
         for i, v in enumerate(problem_list):
             problem_dict[f"问题{i+1}"] = v

@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Tuple
 from pydantic import BaseModel, Field
 from fastapi import FastAPI, Body
 from typing_extensions import Annotated
+import logging
 
 class PhyscialExamination(BaseModel):
     temperature: str
@@ -32,19 +33,44 @@ class BasicMedicalRecord(BaseModel):
     physical_examination: PhyscialExamination 
     auxiliary_examination: str
 
+def get_text_by_desc(model:BaseModel, desc: str) -> str:
+    if isinstance(model, BasicMedicalRecord):
+        funcs = {
+            "主诉": lambda b: b.chief_complaint,
+            "现病史": lambda b: b.history_of_present_illness,
+            "既往史": lambda b: b.past_medical_history,
+            "个人史": lambda b: b.personal_history,
+            "过敏史": lambda b: b.allergy_history,
+            "体温": lambda b: b.physical_examination.temperature,
+            "脉搏": lambda b: b.physical_examination.pulse,
+            "血压": lambda b: b.physical_examination.blood_pressure,
+            "呼吸": lambda b: b.physical_examination.respiration,
+            "辅助检查": lambda b: b.auxiliary_examination,
+        }
+        return funcs[desc](model)
+    else:
+        raise NotImplementedError(desc)
+
 class ControlQuality(BaseModel):
-    content: str
-    field: str
+    doc: str = ""
+    ref_doc: str = ""
+    content: str = ""
+    field: str = ""
+    fields: List[str] = []
+    ref_fields: List[str] = []
     item: str=""
     standard: str=""
     check_quality: Union[str, dict] = ""  
     auto_modify_type: bool = False
     auto_modify_info: str=""
-    positive_example: str=None
-    negative_example: str=None
-    check_quality_detaile: str=None
-    amend_advice: str=None
-    
+    positive_example: Union[str,None]=None
+    negative_example: Union[str,None]=None
+    check_quality_detaile: Union[str,None]=None
+    amend_advice: Union[str,None]=None
+    field_text: Union[str,None]=None
+    issue_text_list: Union[List[str],None]=None
+    issue_index_range: Union[List[Tuple[int, int]],None] = None
+    issue_type: Union[str,None]=None
 
 class HistoricalConversation(BaseModel):
     role: str

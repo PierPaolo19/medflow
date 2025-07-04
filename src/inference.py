@@ -161,4 +161,4 @@ log_name = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 if __name__ == '__main__':
     freeze_support()
     args = args_parser()
-    uvicorn.run(app="inference:app", host=args.host, port=args.port, timeout_keep_alive=30, workers=32,reload=False)
+    uvicorn.run(app="inference:app", host=args.host, port=args.port, timeout_keep_alive=30, workers=1,reload=False)

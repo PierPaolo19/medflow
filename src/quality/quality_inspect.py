@@ -14,7 +14,7 @@
 
 import re
 from typing import Any, Dict, List, Union
-from .quality_common_ds import PhyscialExamination, BasicMedicalRecord, ControlQuality, HistoricalConversations, QualityAPIRequest, DebugPrompt, QualityAPIResponse, QualityAPIRequestInput, QualityAPIResponseOutput
+from .quality_common_ds import PhyscialExamination, BasicMedicalRecord, ControlQuality, HistoricalConversations, QualityAPIRequest, DebugPrompt, QualityAPIResponse, QualityAPIRequestInput, QualityAPIResponseOutput, get_text_by_desc, BaseModel
 import json
 from openai import OpenAI, AsyncOpenAI
 import asyncio
@@ -40,6 +40,18 @@ QUALITY_INSPECT_PROMPT_TEMPLATE_V1_0_CONTENT_OUTPUT = Template("""如果符合�
 检查结果以json格式输出，例如：{"质检结果": "","原因": "","建议修改为":""}。
 """)
 
+QUALITY_INSPECT_PROMPT_TEMPLATE_V2_0_CONTENT_OUTPUT = Template(
+"""请检查：$title
+检查标准为："$standard
+如果符合标准，质检结果为:"通过"。
+如果不符合标准，质检结果为:"不通过"，不通过情况下给出详细说明：包括原因，建议修复，质控类型，存在问题的原文片段列表。
+质控类型包括：单位检查/拼写检查/阈值检查/遗漏检查；存在问题的原文片段要和原文保持一致，方便后续查找出问题位置。
+不要输出python代码。
+只检查待检查内容，不要检查因待检查内容而推理生成的内容。
+检查结果以json格式输出，例如：{"质检结果": "","原因": "","建议修改为":"","质控类型":"","存在问题的原文片段":[]}。
+待检查内容为: "$content"
+""")
+
 QUALITY_INSPECT_PROMPT_TEMPLATE_V1_0_CONTENT_INPUT = Template("""待检查内容为:"$inspect_content。"
 """)
 # QUALITY_INSPECT_PROMPT_TEMPLATE_V1_0_CONTENT_MODIFY  = Template("""请在检查结果后，给出正确修改后的结果，修改后结果的格式为json格式，例如：{"建议修改为": ""}""")
@@ -51,19 +63,33 @@ class QualityInspect:
         openai_api_key: str,
         openai_api_base: str,
         model_name : str,
-        async_client : AsyncOpenAI | None,
+        async_client : AsyncOpenAI | None = None,
     ):
         self.input_request = input_request
-        self.quality_template_info = quality_template_info
+        if self.input_request.control_quality:
+            self.quality_template_info = [f.model_dump() for f in self.input_request.control_quality]
+        else:
+            self.quality_template_info = quality_template_info
         self.openai_api_key = openai_api_key
         self.openai_api_base = openai_api_base
         self.model_name = model_name
+        self.is_expand_all = False
         
         if async_client is None:
             self.async_client = AsyncOpenAI(api_key = openai_api_key, base_url = openai_api_base)
         else:
             self.async_client = async_client
-        self.quality_list = [ControlQuality(**data) for data in self.quality_template_info] 
+        self.quality_list = [ControlQuality(**data) for data in self.quality_template_info]
+        if all([q.doc and q.fields for q in self.quality_list]):
+            self.is_expand_all = True
+            import copy
+            expand_quality_list = []
+            for q in self.quality_list:
+                for f in q.fields:
+                    qi = copy.deepcopy(q)
+                    qi.field = f
+                    expand_quality_list.append(qi)
+            self.quality_list = expand_quality_list
         self.kong_str = "空"
         self.format_inspect = """{
     "质检结果": ""
@@ -80,6 +106,8 @@ class QualityInspect:
         self.QUALITY_PASS = "通过"
         
         self.RESON_OF_NO_PASS = "原因"
+        self.ISSUE_TYPE = "质控类型"
+        self.ISSUE_TEXT_LIST = "存在问题的原文片段"
 
     def __con_medical_record(self, field : str, item : str) -> str:
         """generate new new_fields for AI inference 
@@ -226,7 +254,18 @@ class QualityInspect:
         messages=[{"role": "user", "content": system_str}]
         return messages
 
-    
+    def build_single_doc_inspect_messages(self, control_quality: ControlQuality, input_request: QualityAPIRequest):
+        standard = control_quality.standard
+        messages = []
+        control_quality.field_text = get_text_by_desc(input_request.basic_medical_record, control_quality.field)
+        messages.append({"role": "user", "content": QUALITY_INSPECT_PROMPT_TEMPLATE_V2_0_CONTENT_OUTPUT.substitute(
+            title = control_quality.content,
+            standard = standard,
+            content = control_quality.field_text
+        )})
+        print(messages)
+        return messages
+
     def remove_normal_control_quality(self, control_quality: List[ControlQuality] ):
         ret_control_quality = []
         for cq in control_quality:
@@ -260,6 +299,7 @@ class QualityInspect:
         except Exception as e:
             print(f"发生异常: {e}")
         
+        print(answer)
         result_dict = self.extract_json_data(answer)
         check_quality = result_dict.get(self.CHECK_QUALITY_KEY, self.QUALITY_PASS)
         auto_modify_info = result_dict.get(self.AUTO_MODIFY_KEY, "")
@@ -273,7 +313,14 @@ class QualityInspect:
             control_quality_ret.check_quality_detaile = reson_of_no_pass
         if auto_modify_info is not None and self.QUALITY_NO_PASS in check_quality:
             control_quality_ret.amend_advice = auto_modify_info
-        
+        control_quality_ret.issue_type = result_dict.get(self.ISSUE_TYPE, "")
+        issue_text_list = result_dict.get(self.ISSUE_TEXT_LIST, [])
+        # control_quality_ret.issue_text_list = issue_text_list
+        control_quality_ret.issue_index_range = []
+        for t in issue_text_list:
+            match = re.search(re.escape(t), control_quality.field_text)
+            if match:
+                control_quality_ret.issue_index_range.append((match.start(), match.end()))
         
         return control_quality_ret
    
@@ -281,13 +328,19 @@ class QualityInspect:
     async def async_process_queries(self):
         queries = []
         for index, control_quality in enumerate(self.quality_list):
-            new_fields = self.__con_medical_record(control_quality.field, control_quality.item)
-            messages = self.__get_quality_inspect_message(control_quality.content, 
-                                                          new_fields, 
-                                                          control_quality.auto_modify_type, 
-                                                          control_quality.standard,
-                                                          control_quality.positive_example,
-                                                          control_quality.negative_example)
+            if self.is_expand_all:
+                messages = self.build_single_doc_inspect_messages(control_quality, self.input_request)
+            else:
+                new_fields = self.__con_medical_record(control_quality.field, control_quality.item)
+                messages = self.__get_quality_inspect_message(control_quality.content, 
+                                                            new_fields, 
+                                                            control_quality.auto_modify_type, 
+                                                            control_quality.standard,
+                                                            control_quality.positive_example,
+                                                            control_quality.negative_example)
+                print(f"input {control_quality.field}, {control_quality.item}")
+                print(f"output new fields {new_fields}")
+                print(f"messages {messages}")
             queries.append(messages)
         
         results = await asyncio.gather(*(self.async_predict(query, control_quality) for query, control_quality in zip(queries, self.quality_list)))

@@ -1,5 +1,5 @@
 curl -X 'POST' \
-  'http://ip:port/quality_modify' \
+  'http://127.0.0.1:9001/quality_modify' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '

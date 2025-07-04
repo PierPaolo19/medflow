@@ -1,6 +1,18 @@
 {
     "check_quality":[
         {
+            "doc": "出院小结",
+            "ref_doc": "门诊病历",
+            "content": "入院诊断",
+            "field": "入院诊断",
+            "item": "",
+            "standard": "门诊病历中的信息和住院小结中的入院诊断不应该有冲突",
+            "auto_modify_type": false,
+            "auto_modify_info": "",
+            "positive_example": "",
+            "negative_example": ""
+        },
+        {
             "content": "体温单位",
             "field": "体格检查;",
             "item": "体温",
