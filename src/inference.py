@@ -42,6 +42,7 @@ from diagnosis_treatment.distribute_request_handler import DistributeRequestHand
 from diagnosis_treatment.return_visit_request_handler import ReturnVisitRequestHandler
 from diagnosis_treatment.hospital_guide_request_handler import HospitalGuideRequestHandler
 from diagnosis_treatment.doctor_medical_record_request_handler import DoctorMedicalRecordRequestHandler
+from diagnosis_treatment.in_patient_request_handler import InPatientRequestHandler
 from diagnosis_treatment.prompt_factory import *
 from quality.quality_configs import QualityConfigs
 
@@ -154,7 +155,8 @@ async def request_inference(
     request_type: str = Query(...),
     data: dict = Body(...),
     scheme: str = Query(None),
-    sub_scheme: str = Query(None)
+    sub_scheme: str = Query(None),
+    enable_think: bool = Query(False),
 ):
     args = args_parser()
     handler_classes = {
@@ -167,12 +169,13 @@ async def request_inference(
         "v6": TherapySchemeRequestHandler,
         "v7": ReturnVisitRequestHandler,
         "v8": HospitalGuideRequestHandler,
-        "v9": DoctorMedicalRecordRequestHandler
+        "v9": DoctorMedicalRecordRequestHandler,
+        "inpatient": InPatientRequestHandler
     }
     if request_type in handler_classes:
         handler_class = handler_classes.get(request_type)
         if handler_class:
-            handler = handler_class(data, args, scheme, sub_scheme,request_type, )
+            handler = handler_class(data, args, scheme, sub_scheme,request_type, enable_think)
             results = await thread_pool_executor(handler.handle_request)
     else:
         results = HTTPException(status_code=400, detail="Invalid request_type")

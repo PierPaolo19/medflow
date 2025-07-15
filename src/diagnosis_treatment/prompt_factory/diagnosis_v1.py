@@ -33,7 +33,7 @@ class PromptDiagnosis_v1(PromptTemplate):
     def __set_diagnosis(self):
         #4-生成诊断
         system_str=f"""你是一个优秀的医生。主要工作是根据给出的病历，生成疾病诊断，根据物理检查的各项指标结果，增强确诊疾病细节。
-诊断是json格式，例如：{self.format_diagnose}。
+诊断是json格式，例如：{format_diagnose}。
 生成时先说“根据您的预问诊报告，我为您进行初步诊断如下。请合理安排就医，祝您早日康复。”。
 输出结果前，请检查，诊断标识只有‘确诊’和‘疑似’两种情况。
 注意！诊断名称只能是疾病名称。"""

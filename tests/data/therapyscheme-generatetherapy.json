@@ -4,9 +4,9 @@
             {
                 "patient": {
                     "patient_name": "张三",
-                    "patient_gender": "女",
-                    "patient_age": "76",
-                    "if_child": "否",
+                    "patient_gender": "男",
+                    "patient_age": "44",
+                    "if_child": "",
                     "certificate_type": "",
                     "certificate_number": "",
                     "mobile_number": "",
@@ -26,31 +26,31 @@
             }
         ],
         "basic_medical_record": {
-            "chief_complaint": "解黑便11小时",
-            "history_of_present_illness": "昨晚20时开始无明显诱因出现解黑便2次，呈黑色成形大便，每次量约100g，伴阵发性腹部隐痛，偶有头晕、出冷汗，有气促，无晕厥，无胸痛、胸闷，无呕吐，无发热",
-            "past_medical_history": "胃窦部溃疡伴出血、肺部感染、糜烂性胃炎、十二指肠炎、贫血、高血压病和腰椎退行性病变，骨质疏松，电解质紊乱，老年性心脏瓣膜病，高血压病史多年，长期服药治疗，否认糖尿病",
-            "personal_history": "否认吸烟、酗酒、或过度劳累等习惯",
-            "allergy_history": "否认药物和食物过敏史",
+            "chief_complaint": "咳嗽伴白色痰，高烧40度，胸闷",
+            "history_of_present_illness": "患者自述有咳嗽，伴有白色痰，高烧40度，胸闷，呼吸困难，胸痛为钝痛，无放射，否认近期接触感冒或肺炎患者",
+            "past_medical_history": "高血压,否认糖尿病,否认心脏病,否认慢性支气管炎",
+            "personal_history": "否认吸烟;一个月饮酒几次",
+            "allergy_history": "否认药物过敏;否认食物过敏;否认其他物质过敏",
             "physical_examination": {
-                "temperature": "36.5℃",
-                "pulse": "86次/分",
-                "blood_pressure": "150/61mmHg",
-                "respiration": "18次"
+                "temperature": "",
+                "pulse": "",
+                "blood_pressure": "",
+                "respiration": ""
             },
             "auxiliary_examination": ""
         },
         "diagnosis": [
             {
-                "diagnosis_name": "上消化道出血",
-                "diagnosis_name_retrieve": "上消化道出血",
-                "diagnosis_code": "K92.208",
-                "diagnosis_identifier": "确诊"
+                "diagnosis_name": "急性支气管炎",
+                "diagnosis_name_retrieve": "",
+                "diagnosis_code": "J20.901",
+                "diagnosis_identifier": "疑似"
             },
             {
-                "diagnosis_name": "贫血",
-                "diagnosis_name_retrieve": "贫血",
-                "diagnosis_code": "D64.900",
-                "diagnosis_identifier": "确诊"
+                "diagnosis_name": "肺炎",
+                "diagnosis_name_retrieve": "",
+                "diagnosis_code": "J18.901",
+                "diagnosis_identifier": "疑似"
             }
         ],
         "therapy_fields": [
@@ -112,89 +112,111 @@
         "pick_therapy": [
             {
                 "therapy_name": "方案一",
-                "therapy_summary": "本方案以药物治疗和输液为主，结合必要的检查和生命体征监测，旨在迅速控制上消化道出血，纠正贫血，维持生命体征稳定，并明确出血原因。适用于病情较重但尚未出现休克的患者。",
+                "therapy_summary": "本方案以抗生素治疗为主，结合退热、化痰药物，辅以静脉补液和必要的影像学与实验室检查，旨在快速控制感染、缓解症状并评估病情严重程度。适用于病情较重但尚未出现严重并发症的患者。",
                 "therapy_interpret": [
                     {
                         "therapy_name": "药物治疗",
-                        "therapy_content": "给予质子泵抑制剂（如奥美拉唑）静脉滴注，以抑制胃酸分泌，保护胃黏膜；同时给予生长抑素类药物（如奥曲肽）控制出血。"
+                        "therapy_content": "给予广谱抗生素如头孢克肟（Cefixime）或阿莫西林-克拉维酸（Amoxicillin-Clavulanate），用于控制细菌感染。同时使用退烧药如对乙酰氨基酚（Paracetamol）控制高热。止咳化痰药物如氨溴索（Ambroxol）可缓解咳嗽和排痰。"
                     },
                     {
                         "therapy_name": "输液",
-                        "therapy_content": "静脉输注平衡盐溶液（如乳酸林格液）以维持血容量，必要时输注红细胞悬液纠正贫血。"
+                        "therapy_content": "静脉输注生理盐水或葡萄糖盐水，以补充体液、维持电解质平衡，并可配合抗生素静脉给药。"
                     },
                     {
                         "therapy_name": "检查",
-                        "therapy_content": "进行胃镜检查以明确出血部位及原因，同时进行血常规、肝肾功能、电解质、凝血功能等实验室检查。"
+                        "therapy_content": "进行胸部X光或CT检查以评估肺部感染程度，同时进行血常规、C反应蛋白（CRP）和降钙素原（PCT）检测以评估炎症程度和感染类型。"
                     },
                     {
                         "therapy_name": "处置",
-                        "therapy_content": "监测生命体征，包括血压、心率、呼吸频率及意识状态，必要时吸氧。"
+                        "therapy_content": "保持病房空气流通，鼓励患者多饮水，保持卧床休息，避免劳累。"
                     }
                 ]
             },
             {
                 "therapy_name": "方案二",
-                "therapy_summary": "本方案适用于出血量较大、生命体征不稳定的患者，通过积极的药物和液体复苏，结合影像学检查，快速明确出血原因并控制出血，防止休克发生。",
+                "therapy_summary": "本方案侧重于非典型病原体感染的可能，采用大环内酯类抗生素，并结合物理治疗促进排痰。适用于怀疑非典型病原体感染或对常规抗生素反应不佳的患者。",
                 "therapy_interpret": [
                     {
                         "therapy_name": "药物治疗",
-                        "therapy_content": "静脉给予质子泵抑制剂（如埃索美拉唑）和血管活性药物（如去甲肾上腺素）以控制出血并维持血压。"
+                        "therapy_content": "使用大环内酯类抗生素如阿奇霉素（Azithromycin）或克拉霉素（Clarithromycin），适用于对β-内酰胺类抗生素过敏或怀疑为非典型病原体感染的患者。同时使用退烧药和止咳化痰药物。"
                     },
                     {
-                        "therapy_name": "输液",
-                        "therapy_content": "快速输注晶体液（如生理盐水）和胶体液（如羟乙基淀粉）以维持有效循环血量，必要时输注红细胞。"
+                        "therapy_name": "物理治疗",
+                        "therapy_content": "进行胸部物理治疗，如拍背排痰、体位引流，以促进痰液排出，改善通气。"
                     },
                     {
                         "therapy_name": "检查",
-                        "therapy_content": "紧急进行胃镜检查，同时进行腹部CT或血管造影以评估出血来源及是否存在血管异常。"
+                        "therapy_content": "进行痰培养和药敏试验，以明确病原体类型和指导抗生素选择。"
                     },
                     {
                         "therapy_name": "处置",
-                        "therapy_content": "建立两条静脉通路，持续监测生命体征，必要时转入ICU进行密切监护。"
+                        "therapy_content": "建议患者卧床休息，保持室内湿度适宜，避免刺激性气体和粉尘。"
                     }
                 ]
             },
             {
                 "therapy_name": "方案三",
-                "therapy_summary": "本方案适用于内镜治疗无效或出血严重、危及生命的患者，通过手术直接止血，同时配合药物和液体治疗，以挽救生命并防止并发症。",
+                "therapy_summary": "本方案适用于病情较重或进展较快的肺炎患者，采用强效抗生素静脉给药，并结合影像学和血气分析评估病情，以防止病情恶化。",
                 "therapy_interpret": [
                     {
-                        "therapy_name": "手术治疗",
-                        "therapy_content": "若胃镜检查发现出血灶无法内镜下止血，或出血量大且持续，考虑进行外科手术（如胃大部切除术或血管结扎术）止血。"
-                    },
-                    {
                         "therapy_name": "药物治疗",
-                        "therapy_content": "术前给予静脉质子泵抑制剂和血管活性药物，术后继续维持治疗。"
+                        "therapy_content": "使用氟喹诺酮类抗生素如左氧氟沙星（Levofloxacin）或莫西沙星（Moxifloxacin），适用于成人患者，尤其是社区获得性肺炎的治疗。同时使用退烧药和止咳化痰药物。"
                     },
                     {
                         "therapy_name": "输液",
-                        "therapy_content": "术前术后均需维持静脉输液，必要时输注红细胞和血浆以纠正贫血和维持血容量。"
+                        "therapy_content": "静脉输注抗生素和补液，以快速控制感染并维持水电解质平衡。"
                     },
                     {
                         "therapy_name": "检查",
-                        "therapy_content": "术前进行血常规、凝血功能、心电图等检查，术后监测血红蛋白、电解质及肝肾功能。"
+                        "therapy_content": "进行胸部CT、血气分析和痰培养，以评估肺部病变程度和是否存在低氧血症。"
+                    },
+                    {
+                        "therapy_name": "处置",
+                        "therapy_content": "密切监测生命体征，必要时吸氧治疗，保持患者安静休息。"
                     }
                 ]
             },
             {
                 "therapy_name": "方案四",
-                "therapy_summary": "本方案适用于出血量小、症状轻微、生命体征稳定的患者，通过观察和基础治疗控制病情，避免不必要的侵入性操作，同时密切监测病情变化。",
+                "therapy_summary": "本方案适用于症状较轻、无严重并发症的患者，以口服药物为主，结合门诊观察和基础检查，避免住院治疗，减少医疗资源占用。",
                 "therapy_interpret": [
                     {
                         "therapy_name": "观察治疗",
-                        "therapy_content": "若患者出血量小、生命体征稳定，可暂不进行侵入性治疗，密切观察黑便次数、颜色及伴随症状变化。"
+                        "therapy_content": "对于症状较轻、无明显呼吸困难或低氧血症的患者，可采取门诊观察治疗，每日监测体温、呼吸频率和血氧饱和度。"
                     },
                     {
                         "therapy_name": "药物治疗",
-                        "therapy_content": "口服或静脉给予质子泵抑制剂，预防进一步出血。"
+                        "therapy_content": "口服抗生素如阿莫西林-克拉维酸或头孢丙烯（Cefprozil），配合退烧药和止咳化痰药物。"
                     },
                     {
                         "therapy_name": "检查",
-                        "therapy_content": "进行血常规、大便潜血试验、肝肾功能等检查，评估贫血程度及出血情况。"
+                        "therapy_content": "进行血常规和胸部X光检查，以评估感染程度和肺部情况。"
                     },
                     {
                         "therapy_name": "处置",
-                        "therapy_content": "监测生命体征，嘱患者卧床休息，避免剧烈活动，保持大便通畅。"
+                        "therapy_content": "建议患者居家休息，避免外出，保持良好营养和水分摄入。"
+                    }
+                ]
+            },
+            {
+                "therapy_name": "方案五",
+                "therapy_summary": "本方案适用于病情复杂、疑似混合感染或治疗反应不佳的患者，采用联合抗生素治疗，并结合全面的检查和处置措施，以提高治疗成功率。",
+                "therapy_interpret": [
+                    {
+                        "therapy_name": "药物治疗",
+                        "therapy_content": "联合使用两种抗生素（如阿莫西林-克拉维酸+阿奇霉素），以覆盖可能的混合感染。同时使用退烧药和止咳化痰药物。"
+                    },
+                    {
+                        "therapy_name": "输液",
+                        "therapy_content": "静脉输注抗生素和补液，以快速控制感染并维持水电解质平衡。"
+                    },
+                    {
+                        "therapy_name": "检查",
+                        "therapy_content": "进行胸部CT、血气分析、痰培养和药敏试验，以全面评估病情和指导治疗。"
+                    },
+                    {
+                        "therapy_name": "处置",
+                        "therapy_content": "密切监测生命体征，必要时吸氧治疗，保持患者安静休息。"
                     }
                 ]
             }

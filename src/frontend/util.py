@@ -12,12 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import json
 import datetime
-import pandas as pd
-import re
+import json
+import os
 import random
+import re
+
+import pandas as pd
+from openai import Client
+
+from frontend.config import args
 
 path = os.getcwd()
 
@@ -122,3 +126,28 @@ def write_to_file(json_file, json_display):
     return write_flag
 
 inference_gradio_json_data = read_json()
+
+def asr(save_path, asr_model: str="dolphin-small"):
+    client = Client(api_key="EMPTY", base_url=args.voice_url)
+    with open(save_path, 'rb') as f:
+        #completion = client.audio.transcriptions.create(model=asr_model, file=f, language="yue")
+        completion = client.audio.transcriptions.create(model=asr_model, file=f, language="zh")
+        print(completion.text)
+    return completion.text
+
+def tts(SAVE_DIR, input_str, tts_model:str="CosyVoice-300M-SFT", voice:str="中文女"):
+    #['中文女', '中文男', '日语男', '粤语女', '英文女', '英文男', '韩语女']
+    unique_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+    save_name = f"record_{unique_id}.wav"
+    save_path = os.path.join(SAVE_DIR, save_name)
+
+    client = Client(api_key="EMPTY", base_url=args.voice_url)
+    with client.audio.speech.with_streaming_response.create(
+        model=tts_model,
+        voice=voice,
+        response_format="wav",
+        input=input_str,
+    ) as response:
+        response.stream_to_file(save_path)
+
+    return save_path

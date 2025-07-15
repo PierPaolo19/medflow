@@ -24,6 +24,7 @@ from frontend.ui.ui import (
     interface_returnvisit,
     interface_hospitalguide,
     interface_doctormedicalrecord,
+    interface_inpatient,
     quality_inspect_interface,
     quality_modify_interface
 )
@@ -55,6 +56,7 @@ def build_app():
                 diagnosis_btn = gr.Button("🧬 疾病诊断", size="md", visible=False)
                 examass_btn = gr.Button("🧪 检查化验开具", size="md", visible=False)
                 scheme_btn = gr.Button("🌿 治疗方案", size="md", visible=False)
+                inpatient_btn = gr.Button("🛏️ 住院文书", size="md", visible=False)
 
                 post_btn = gr.Button("📋️ 诊后模块", variant="primary", size="md")
                 returnvisit_btn = gr.Button("🔁 患者复诊", size="md", visible=False)
@@ -82,6 +84,8 @@ def build_app():
                     interface_examass.render()
                 with gr.Group(visible=False, elem_id="shared_group") as view_scheme:
                     interface_scheme.render()
+                with gr.Group(visible=False, elem_id="shared_group") as view_inpatient:
+                    interface_inpatient.render()
                 with gr.Group(visible=False, elem_id="shared_group") as view_returnvisit:
                     interface_returnvisit.render()
 
@@ -94,7 +98,7 @@ def build_app():
             if idx == 1:
                 return state, gr.update(visible=state[idx]), gr.update(visible=state[idx]), \
                     gr.update(visible=state[idx]), gr.update(visible=state[idx]), gr.update(visible=state[idx]), \
-                    gr.update(visible=state[idx])
+                    gr.update(visible=state[idx]), gr.update(visible=state[idx])
             if idx == 2:
                 return state, gr.update(visible=state[idx])
 
@@ -106,7 +110,7 @@ def build_app():
         in_btn.click(
             fn=navigation,
             inputs=[gr.Text(value=1, visible=False), state],
-            outputs=[state, quality_inspect_btn, quality_modify_btn, doctormedicalrecord_btn, diagnosis_btn, examass_btn, scheme_btn]
+            outputs=[state, quality_inspect_btn, quality_modify_btn, doctormedicalrecord_btn, diagnosis_btn, examass_btn, scheme_btn, inpatient_btn]
         )
         post_btn.click(
             fn=navigation,
@@ -120,12 +124,12 @@ def build_app():
                     lambda idx=idx: [gr.update(visible=(i==idx)) for i in range(len(btns))],
                     outputs=[view_clientinfo, view_basicmedicalrecord, view_hospitalguide, view_hospitalregister,
                              view_quality_inspect, view_quality_modify, view_doctormedicalrecord, view_diagnosis,
-                             view_examass, view_scheme, view_returnvisit]
+                             view_examass, view_scheme, view_inpatient, view_returnvisit]
                 )
 
         sub_btns_click(
             btns=[clientinfo_btn, basicmedicalrecord_btn, hospitalguide_btn, hospitalregister_btn, quality_inspect_btn,
-                  quality_modify_btn, doctormedicalrecord_btn, diagnosis_btn, examass_btn, scheme_btn, returnvisit_btn]
+                  quality_modify_btn, doctormedicalrecord_btn, diagnosis_btn, examass_btn, scheme_btn, inpatient_btn, returnvisit_btn]
         )
 
     return app
@@ -141,5 +145,8 @@ if __name__ == "__main__":
         server_port=args.gradio_port,
         share=args.share,
         max_threads=200,
-        auth=None
+        auth=None,
+        ssl_certfile="./cert.pem",
+        ssl_keyfile="./key.pem",
+        ssl_verify=False,
     )

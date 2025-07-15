@@ -12,22 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import json
-import gradio as gr
-import datetime
+import asyncio
 import copy
+import datetime
+import json
+import os
+
+import gradio as gr
 import httpx
 import numpy as np
 import requests
-from ..util import inference_gradio_json_data, write_to_file
-from ..config import args, inference_gradio_http_common_headers
 from diagnosis_treatment.prompt_template import (
+    request_type_map,
+    reversed_inpatient_fields,
     reversed_medical_fields,
     reversed_sub_medical_fields,
-    request_type_map
 )
 from fastapi import HTTPException
+from pydub import AudioSegment
+
+from ..config import args, inference_gradio_http_common_headers
+from ..util import asr, inference_gradio_json_data, tts, write_to_file
 
 path = os.getcwd()
 
@@ -239,7 +244,7 @@ async def fetch_response_nochat(json_display, json_file, module, json_md, result
     unique_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     json_file = f"{module}-{unique_id}.json"
     json_display_dict = json.loads(json_display)
-    if module == "doctormedicalrecord":
+    if module in ["doctormedicalrecord", "inpatient"]:
         url = f"http://{args.host}:{args.port}/inference?request_type={request_type_map[module]}&scheme={branch}"
     else:
         url = f"http://{args.host}:{args.port}/inference?request_type={request_type_map[module]}"
@@ -300,6 +305,26 @@ async def fetch_response_nochat(json_display, json_file, module, json_md, result
                 json_md=f"""Successfully! write data to {json_file}."""
                 results_json = json.dumps(results_json, ensure_ascii=False, indent=4)
                 return json_display, json_file, module, json_md, results, results_json, branch
+
+            if module == "inpatient":
+                inpatient = response.json()['output']['inpatient']
+                for key, value in inpatient.items():
+                    if isinstance(value, dict):
+                        results += f"【{reversed_inpatient_fields.get(key)}】：\n"
+                        for k, v in value.items():
+                            results += f"{reversed_inpatient_fields.get(k)}: {v}\n"
+                    elif isinstance(value, list):
+                        results += f"【{reversed_inpatient_fields.get(key)}】：\n"
+                        for v in value:
+                            results += f"{v['diagnosis_name']}（{v['diagnosis_name_retrieve']}）    {v['diagnosis_code']}    {v['diagnosis_identifier']}\n"
+                    else:
+                        results += f"【{reversed_inpatient_fields.get(key)}】：{value}\n"
+                with open(json_file, 'w', encoding='utf-8') as f:
+                    json.dump((results_json), f, ensure_ascii=False, indent=4)
+                f.close()
+                json_md=f"""Successfully! write data to {json_file}."""
+                results_json = json.dumps(results_json, ensure_ascii=False, indent=4)
+                return json_display, json_file, module, json_md, results, results_json, branch
         else:
             return "Error: Unable to fetch response from inference API."
 
@@ -340,7 +365,7 @@ async def fetch_response_generate_therapy(json_display, json_file, module, json_
     json_file = f"{module}-{unique_id}.json"
     json_display_dict = json.loads(json_display)
 
-    url = f"http://{args.host}:{args.port}/inference?request_type=v6&scheme=generate_therapy&sub_scheme={branch}"
+    url = f"http://{args.host}:{args.port}/inference?request_type=v6&scheme=generate_therapy&sub_scheme={branch}&enable_think=1"
     async with httpx.AsyncClient() as client:
         response = await client.post(
             url,
@@ -435,3 +460,67 @@ async def fetch_response_generate_therapy(json_display, json_file, module, json_
             return json_display, json_file, module, json_md, results, results_json, branch
         else:
             return "Error: Unable to fetch response from inference API."
+
+async def fetch_response_generate_all_therapy(json_display, json_file, module, json_md, result_text, result_json, branch=None):
+    unique_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+    json_file = f"{module}-{unique_id}.json"
+    json_display_dict = json.loads(json_display)
+
+    url = f"http://{args.host}:{args.port}/inference?request_type=v6&scheme=pick_therapy"
+    async with httpx.AsyncClient(timeout=240) as client:
+        response = await client.post(url, json=json_display_dict)
+        output = copy.deepcopy(response.json())
+        print(f"\n请求结果:{response.json()}")
+
+    therapy_num = len(output['output']['pick_therapy'])
+    sema = asyncio.Semaphore(6)
+    async def generate_therapy(index: int):
+        nonlocal output
+        url = f"http://{args.host}:{args.port}/inference?request_type=v6&scheme=generate_therapy&sub_scheme={index}&enable_think=1"
+        async with sema:
+            async with httpx.AsyncClient(timeout=240) as client:
+                response = await client.post(url, json=output)
+                output['output']['generate_therapy'].append(response.json()['output']['generate_therapy'][0])
+                print(f"\n请求结果:{response.json()}")
+
+    tasks = [asyncio.create_task(generate_therapy(index)) for index in range(1, therapy_num+1, 1)]
+    await asyncio.gather(*tasks)
+
+    output['output']['generate_therapy'].pop(0)
+    result_json = json.dumps(output, ensure_ascii=False, indent=4)
+    return json_display, json_file, module, json_md, result_text, result_json, branch
+
+SAVE_DIR = "./audios"
+os.makedirs(SAVE_DIR, exist_ok=True)
+def save_audio(audio):
+    if not audio:
+        return "", "Not Found: Please Record First."
+
+    unique_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+    type = audio.split(".")[-1]
+    save_name = f"record_{unique_id}.{type}"
+    save_path = os.path.join(SAVE_DIR, save_name)
+    if type == "mp3":
+        audio = AudioSegment.from_mp3(audio)
+    elif type == "wav":
+        audio = AudioSegment.from_wav(audio)
+    else:
+        return "", "Error: Unsupported Media Type."
+
+    audio.export(save_path, format=type)
+
+    return save_path, f"The audio has been saved:  {save_path}"
+
+def update_by_asr(save_path, json_display, asr_model):
+    completion_text = asr(save_path, asr_model)
+    json_display = json.loads(json_display)
+    json_display['input']['doctor_supplement'] = completion_text
+    json_display = json.dumps(json_display, ensure_ascii=False, indent=4)
+    return "", json_display
+
+def update_by_tts(enable_voice, chatbot, tts_model):
+    if enable_voice == "YES":
+        save_path = tts(SAVE_DIR, chatbot[-1][1], tts_model)
+    else:
+        save_path = None
+    return save_path

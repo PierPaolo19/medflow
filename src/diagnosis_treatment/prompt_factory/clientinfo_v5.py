@@ -30,10 +30,10 @@ class PromptClientInfo_v5(PromptTemplate):
 
     def set_prompt(self):
         self.variables = {
-            "format_client_select": self.format_client_select,
-            "format_client_info": self.format_client_info,
+            "format_client_select": format_client_select,
+            "format_client_info": format_client_info,
             "verify_results": self.verify_results,
-            "format_translate": self.format_translate,
+            "format_translate": format_translate,
             "patient_name": self.ci_p.patient_name,
             "if_child": self.ci_p.if_child,
             "patient_gender": self.ci_p.patient_gender,

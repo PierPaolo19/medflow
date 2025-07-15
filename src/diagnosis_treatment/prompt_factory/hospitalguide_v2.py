@@ -37,12 +37,12 @@ class PromptHospitalGuide_v2(PromptTemplate):
             "patient_gender": self.ci_p.patient_gender,
             "patient_age": self.ci_p.patient_age,
             "reversed_patient_gender": gender_map.get(self.ci_p.patient_gender),
-            "format_hospital_guide1": self.format_hospital_guide1,
-            "format_hospital_guide2": self.format_hospital_guide2,
+            "format_hospital_guide1": format_hospital_guide1,
+            "format_hospital_guide2": format_hospital_guide2,
             "all_department": self.all_department,
             "department_intro": self.department_intro,
             "chief_complaint": self.bmr.chief_complaint,
-            "format_basic_medical_record": self.format_basic_medical_record
+            "format_basic_medical_record": format_basic_medical_record
         }
         self.prompt = {
             "8": self.__set_hospital_guide()

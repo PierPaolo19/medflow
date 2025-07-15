@@ -36,9 +36,10 @@ class ReturnVisitRequestHandler(BaseDiagnosisRequestHandler):
                  args,
                  scheme : None,
                  sub_scheme : None,
-                 request_type: None
+                 request_type: None,
+                 enable_think: False
                  ):
-        super().__init__(receive, args, scheme, sub_scheme, request_type)
+        super().__init__(receive, args, scheme, sub_scheme, request_type, enable_think)
         try:
             self.receive = RequestV7(**receive)
         except ValidationError as e:

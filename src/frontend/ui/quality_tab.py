@@ -101,8 +101,12 @@ def create_quality_inspect_interface(json_display_quality_modify):
                 with gr.Row():
                     send_quality_modify = gr.Button(value="发送到 质检修改", variant="primary", scale=1, visible=True)
             with gr.Column():
-                model_name = gr.Dropdown(label="Model Name", choices=[args.model], value=args.model, interactive=True, show_label=False, container=False)
-                prompt_version = gr.Dropdown(label="Prompt Version", choices=prompt_versions["quality_inspect"], value=max(prompt_versions["quality_inspect"]), interactive=True, show_label=False, container=False)
+                with gr.Row():
+                    gr.Textbox(value="Model name:", visible=True, show_label=False, container=False, min_width=140, scale=1)
+                    model_name = gr.Dropdown(label="Model Name", choices=[args.model], value=args.model, interactive=True, show_label=False, container=False, scale=9)
+                with gr.Row():
+                    gr.Textbox(value="Prompt version:", visible=True, show_label=False, container=False, min_width=140, scale=1)
+                    prompt_version = gr.Dropdown(label="Prompt Version", choices=prompt_versions["quality_inspect"], value=max(prompt_versions["quality_inspect"]), interactive=True, show_label=False, container=False, scale=9)
                 quality_inspect_result = gr.JSON(label="质检结果", value=None, visible=True, show_label=True, open=True)
                 with gr.Row():
                     check_btn = gr.Button(value="检查", variant="primary", scale=1)
@@ -129,8 +133,12 @@ def create_quality_modify_interface():
                     json_file = gr.Textbox(value=json_file_str, visible=False, show_label=False)
                     json_md = gr.Markdown(value="")
             with gr.Column():
-                model_name = gr.Dropdown(label="Model Name", choices=[args.model], value=args.model, interactive=True, show_label=False, container=False)
-                prompt_version = gr.Dropdown(label="Prompt Version", choices=prompt_versions["quality_modify"], value=max(prompt_versions["quality_inspect"]), interactive=True, show_label=False, container=False)
+                with gr.Row():
+                    gr.Textbox(value="Model name:", visible=True, show_label=False, container=False, min_width=140, scale=1)
+                    model_name = gr.Dropdown(label="Model Name", choices=[args.model], value=args.model, interactive=True, show_label=False, container=False, scale=9)
+                with gr.Row():
+                    gr.Textbox(value="Prompt version:", visible=True, show_label=False, container=False, min_width=140, scale=1)
+                    prompt_version = gr.Dropdown(label="Prompt Version", choices=prompt_versions["quality_modify"], value=max(prompt_versions["quality_inspect"]), interactive=True, show_label=False, container=False, scale=9)
                 chatbot=gr.Chatbot(
                     label="Chat",
                     value=[[None, None]],

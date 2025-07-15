@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC, abstractmethod
+import re
 import copy
+from abc import ABC, abstractmethod
 from openai import OpenAI
 from .prompt_template import *
 from .util_data_models import *
@@ -25,7 +26,8 @@ class BaseDiagnosisRequestHandler(ABC):
                  args,
                  scheme : None, 
                  sub_scheme : None,
-                 request_type: None
+                 request_type: None,
+                 enable_think: False
                  ):
         self.receive = receive
         self.args = args
@@ -35,6 +37,7 @@ class BaseDiagnosisRequestHandler(ABC):
         self.database = args.database
         self.scheme = scheme
         self.sub_scheme = sub_scheme
+        self.enable_think = enable_think
         self.temprature = 0
         self.top_p = 1
         #self.args = args_parser()
@@ -68,7 +71,14 @@ class BaseDiagnosisRequestHandler(ABC):
                 hc_bak = hc_bak[stop_list[-1]+1:]
         #print(f"推理输入对话: {hc_bak=}")
 
-        return hc_bak
+        infer = []
+        format = r"<think>(.*?)</think>"
+        for item in hc_bak:
+            item = json.loads(item.json())
+            item['content'] = re.sub(format, '', item['content'], flags=re.DOTALL).strip()
+            infer.append(HistoricalConversations.parse_obj(item))
+        #print(f"推理输入对话: {infer=}")
+        return infer
 
     def preprocess(self, receive, prompt, flag):
         params = copy.deepcopy(receive)
@@ -89,7 +99,7 @@ class BaseDiagnosisRequestHandler(ABC):
         #        irrelevant+=1
         #current_round-=(irrelevant*2)
         match flag:
-            case 0|11:
+            case 0|11|"inpatient":
                 for item in infer_hc:
                     messages.append({'role': item.role, 'content': item.content})
             case 33:
@@ -176,16 +186,20 @@ class BaseDiagnosisRequestHandler(ABC):
 
         return messages
     
-    def predict(self, messages, temp:float=0, top_p:float=1):
+    def predict(self, messages, temp:float=0, top_p:float=1, close_think:bool=True):
+        enable_think = self.enable_think if close_think else close_think
         client = OpenAI(api_key=self.openai_api_key, base_url=self.openai_base_url)
         chat_response = client.chat.completions.create(
-            model= self.model,
+            model=self.model,
             messages=messages,
             temperature=temp,
             top_p=top_p,
             max_tokens=self.args.max_tokens,
             stream=False,#True
             stop="<|eot_id|>",
+            extra_body={
+                "chat_template_kwargs": {"enable_thinking": enable_think},
+            },
         )
         '''
         answer=""
@@ -197,18 +211,22 @@ class BaseDiagnosisRequestHandler(ABC):
         #print(f"对话结果: {answer=}")
         return answer
     
-    def predict_stream(self, messages, temp:float=0, top_p:float=1):
+    def predict_stream(self, messages, temp:float=0, top_p:float=1, close_think:bool=True):
+        enable_think = self.enable_think if close_think else close_think
         client = OpenAI(api_key=self.openai_api_key, base_url=self.openai_base_url)
         chat_response = client.chat.completions.create(
-            model= self.model,
+            model=self.model,
             messages=messages,
             temperature=temp,
             top_p=top_p,
             max_tokens=self.args.max_tokens,
             stream=True,
             stop="<|eot_id|>",
+            extra_body={
+                "chat_template_kwargs": {"enable_thinking": enable_think},
+            },
         )
-        
+
         for chunk in chat_response:
             if chunk.choices[0].delta.content is not None:
                 #print(f"{chunk.choices[0].delta.content=}")

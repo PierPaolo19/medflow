@@ -40,7 +40,7 @@ class PromptScheme_v4(PromptTemplate):
     def set_prompt(self):
         self.variables = {
             "therapy_fields": "、".join(self.therapy_fields.values()),
-            "format_pick_therapy": self.format_pick_therapy,
+            "format_pick_therapy": format_pick_therapy,
             "patient_name": self.ci_p.patient_name,
             "patient_gender": self.ci_p.patient_gender,
             "patient_age": self.ci_p.patient_age,
@@ -51,12 +51,12 @@ class PromptScheme_v4(PromptTemplate):
             "physical_examination": self.physical_examination,
             "auxiliary_examination": self.bmr.auxiliary_examination,
             "diagnose_definite": self.diagnose_definite,
-            "format_prescription": self.format_prescription,
-            "format_transfusion": self.format_transfusion,
-            "format_disposition": self.format_disposition,
-            "format_examine": self.format_examine,
-            "format_assay": self.format_assay,
-            "format_generate_therapy": self.format_generate_therapy
+            "format_prescription": format_prescription,
+            "format_transfusion": format_transfusion,
+            "format_disposition": format_disposition,
+            "format_examine": format_examine,
+            "format_assay": format_assay,
+            "format_generate_therapy": format_generate_therapy
         }
         self.prompt = {
             "6": self.__set_default_therapy(),

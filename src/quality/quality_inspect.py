@@ -299,7 +299,10 @@ class QualityInspect:
             temperature=temp,
             top_p=top_p,
             max_tokens=4096, 
-            timeout = 30
+            timeout = 30,
+            extra_body={
+                "chat_template_kwargs": {"enable_thinking": False},
+            },
         )
 
         control_quality_ret = control_quality

@@ -50,7 +50,7 @@ class PromptScheme_v1(PromptTemplate):
             #挑选多方案
             system_str=f"""你是一个优秀的专业医生。主要工作是根据患者的病历，从如下9个方案名称中挑选合适的：\
 “保守治疗、手术治疗、化疗、放疗、心理治疗、康复治疗、物理治疗、替代疗法、观察治疗”，并对选中的每个方案都生成100字以上的方案解读，\
-最后以json格式返回，例如：{self.format_pick_therapy}。生成时先说“您已确诊，现在为您生成方案：”。\
+最后以json格式返回，例如：{format_pick_therapy}。生成时先说“您已确诊，现在为您生成方案：”。\
 注意：挑选的方案必须在上边所列的9个方案名称中，且需要挑选3~5个方案，其中必须要包含保守治疗。"""
             user_str=f"""当前患者的姓名是{self.ci_p.patient_name}，性别是{self.ci_p.patient_gender}，年龄是{self.ci_p.patient_age}，\
 主诉是“{self.bmr.chief_complaint}”，现病史是“{self.bmr.history_of_present_illness}”，\
@@ -65,7 +65,7 @@ class PromptScheme_v1(PromptTemplate):
                     system_str=f"""你是一个优秀的专业医生。主要工作是根据患者的病历，合理开药并生成处方。\
 注意，病历中包含的所有疾病都需要开出对应的药品。请注意，你必须给出尽可能全面的药品名称**及其详细的医学依据，\
 包括药品的具体作用和开药的理由**。
-处方的格式严格按照如下：{self.format_prescription}。
+处方的格式严格按照如下：{format_prescription}。
 遵循以下步骤进行：
 1.读取病历信息：读取病历信息的全部内容，确定患者共有几种疾病，及所患疾病的名称。
 2.分析诊断信息：根据诊断信息确定患者共患几种疾病。
@@ -81,7 +81,7 @@ class PromptScheme_v1(PromptTemplate):
                     system_str=f"""你是一个优秀的专业医生。主要工作是根据患者的病历，合理开药并生成输液方案。\
 注意，病历中包含的所有疾病都需要开出对应的输液。请注意，你必须给出尽可能全面的药品名称**及其详细的医学依据，\
 包括药品的具体作用和开药的理由**。
-输液的格式严格按照如下：{self.format_transfusion}。
+输液的格式严格按照如下：{format_transfusion}。
 遵循以下步骤进行：
 1.读取病历信息：读取病历信息的全部内容，确定患者共有几种疾病，及所患疾病的名称。
 2.分析诊断信息：根据诊断信息确定患者共患几种疾病。
@@ -95,7 +95,7 @@ class PromptScheme_v1(PromptTemplate):
                 case "disposition":
                     #生成处置
                     system_str=f"""你是一个优秀的专业医生。主要工作是根据患者的病历，生成处置。处置的格式严格按照如下：\
-{self.format_disposition}。生成时先说“您已确诊，现在为您生成处置：”。注意：处置要包含项目编号、项目名称、频次、\
+{format_disposition}。生成时先说“您已确诊，现在为您生成处置：”。注意：处置要包含项目编号、项目名称、频次、\
 单次用量、持续时间，不可以漏项。处置中可以生成1~2组处置项。"""
                     user_str=f"""当前患者的主诉是“{self.bmr.chief_complaint}”，现病史是“{self.bmr.history_of_present_illness}”，\
 个人史是“{self.bmr.personal_history}”，过敏史是“{self.bmr.allergy_history}”，\
@@ -108,7 +108,7 @@ class PromptScheme_v1(PromptTemplate):
             cked_therapy = reversed_therapy_scheme_fields[self.sub_scheme]
             system_str=f"""你是一个优秀的专业医生。主要工作是根据患者的病历，参考相关医学指南与医疗专业书籍，\
 生成关于“{cked_therapy}”的治疗方案。治疗方案包含治疗编号、治疗类型、治疗名称、针对疾病、治疗计划、潜在风险。\
-治疗方案的格式严格按照如下：{self.format_generate_therapy}。生成时先说“您已确诊，现在为您生成治疗方案：”。\
+治疗方案的格式严格按照如下：{format_generate_therapy}。生成时先说“您已确诊，现在为您生成治疗方案：”。\
 注意：治疗计划要进行充分且详尽的描述。"""
             user_str=f"""当前患者的姓名是{self.ci_p.patient_name}，性别是{self.ci_p.patient_gender}，年龄是{self.ci_p.patient_age}，\
 主诉是“{self.bmr.chief_complaint}”，现病史是“{self.bmr.history_of_present_illness}”，\

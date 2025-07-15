@@ -31,7 +31,7 @@ class PromptExamAss_v2(PromptTemplate):
 
     def set_prompt(self):
         self.variables = {
-            "format_examine_assay": self.format_examine_assay,
+            "format_examine_assay": format_examine_assay,
             "patient_name": self.ci_p.patient_name,
             "patient_gender": self.ci_p.patient_gender,
             "patient_age": self.ci_p.patient_age,

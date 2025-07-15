@@ -47,3 +47,5 @@ from .scheme_v1 import *
 from .scheme_v2 import *
 from .scheme_v3 import *
 from .scheme_v4 import *
+from .scheme_v5 import *
+from .inpatient_v1 import *

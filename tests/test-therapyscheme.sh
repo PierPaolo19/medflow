@@ -25,7 +25,7 @@ curl -X 'POST' \
   echo -e "\n==================================\n"
 
 curl -X 'POST' \
-  "http://$ip:$port/inference?request_type=v6&scheme=generate_therapy&sub_scheme=2" \
+  "http://$ip:$port/inference?request_type=v6&scheme=generate_therapy&sub_scheme=1&enable_think=1" \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d @data/therapyscheme-generatetherapy.json
@@ -33,7 +33,7 @@ curl -X 'POST' \
   echo -e "\n==================================\n"
 
 curl -X 'POST' \
-  "http://$ip:$port/inference?request_type=v6&scheme=generate_therapy&sub_scheme=3" \
+  "http://$ip:$port/inference?request_type=v6&scheme=generate_therapy&sub_scheme=2&enable_think=1" \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d @data/therapyscheme-generatetherapy.json
@@ -41,7 +41,23 @@ curl -X 'POST' \
   echo -e "\n==================================\n"
 
 curl -X 'POST' \
-  "http://$ip:$port/inference?request_type=v6&scheme=generate_therapy&sub_scheme=4" \
+  "http://$ip:$port/inference?request_type=v6&scheme=generate_therapy&sub_scheme=3&enable_think=1" \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d @data/therapyscheme-generatetherapy.json
+
+  echo -e "\n==================================\n"
+
+curl -X 'POST' \
+  "http://$ip:$port/inference?request_type=v6&scheme=generate_therapy&sub_scheme=4&enable_think=1" \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d @data/therapyscheme-generatetherapy.json
+
+  echo -e "\n==================================\n"
+
+curl -X 'POST' \
+  "http://$ip:$port/inference?request_type=v6&scheme=generate_therapy&sub_scheme=5&enable_think=1" \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d @data/therapyscheme-generatetherapy.json

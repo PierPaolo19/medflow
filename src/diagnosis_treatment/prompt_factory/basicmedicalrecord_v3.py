@@ -52,13 +52,13 @@ class PromptBasicMedicalRecord_v3(PromptTemplate):
 7.向患者了解吸烟史，记录到【个人史】。当患者表示不吸烟时，在【个人史】中记录为“否认xxx”。当患者表示有吸烟时，进一步询问情况。
 8.向患者了解饮酒史，记录到【个人史】。当患者表示不喝酒时，在【个人史】中记录为“否认xxx”。当患者表示有饮酒时，进一步询问情况。
 9.向患者了解过敏史，记录到【过敏史】。当患者表示没有xx过敏，记录为“否认xxx过敏”。当患者表示对xx过敏，记录为“对xx过敏”。
-10.生成病历。病历生成时先说“现在为您返回病历：”。病历的格式为json格式，例如：{self.format_basic_medical_record}。\
+10.生成病历。病历生成时先说“现在为您返回病历：”。病历的格式为json格式，例如：{format_basic_medical_record}。\
 对于患者没有提及的内容，可以记录为“无”。
 11.如果患者表示病历需要修改，表示抱歉后将修改后的病历重新输出，直到患者表示病历正确。"""
         else:
             system_str += f"""
 7.向患者了解过敏史，记录到【过敏史】。当患者表示没有xx过敏，记录为“否认xxx过敏”。当患者表示对xx过敏，记录为“对xx过敏”。
-8.生成病历。病历生成时先说“现在为您返回病历：”。病历的格式为json格式，例如：{self.format_basic_medical_record}。\
+8.生成病历。病历生成时先说“现在为您返回病历：”。病历的格式为json格式，例如：{format_basic_medical_record}。\
 其中，个人史记录为“无”。
 9.如果患者表示病历需要修改，表示抱歉后将修改后的病历重新输出，直到患者表示病历正确。"""
         system_str += f"""
@@ -85,7 +85,7 @@ class PromptBasicMedicalRecord_v3(PromptTemplate):
 -过敏史：“{self.bmr.allergy_history}”
 ## Workflow：
 1.按照患者的要求对病历进行修改，并直接返回修改后的病历。病历生成时先说“现在为您返回修改后的病历：”。病历的格式严格按照如下：
-{self.format_basic_medical_record}。
+{format_basic_medical_record}。
 2.注意，修改后的病历不能存在前后描述矛盾的地方，尤其是吸烟史、饮酒史。在既往史中，患者未提及的内容不要进行修改。
 3.如果患者表示病历正确时，回复“好的，谢谢！祝您早日康复！”。
 ## Initialization:
