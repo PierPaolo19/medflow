@@ -14,7 +14,7 @@ max_tokens=4096
 voice_server_port=9997
 
 export CUDA_VISIBLE_DEVICES=${IEI_VISIBLE_DEVICES}
-MODEL_NAME=${IEI_VISILE_MODELS_NAME}
+MODEL_NAME=${IEI_VISIBLE_MODELS_NAME}
 MODEL_PATH=${IEI_VISIBLE_MODELS_PATH}${MODEL_NAME}
 MODEL_URL="http://"${IEI_VISIBLE_OS_IP}":"${openai_api_server_port}"/v1"
 VOICE_URL="http://"${IEI_VISIBLE_OS_IP}":"${voice_server_port}"/v1"
@@ -26,6 +26,7 @@ fi
 
 if [ ! -f "../src/key.pem" ] || [ ! -f "../src/cert.pem" ]; then
     openssl req -x509 -newkey rsa:4096 -keyout ../src/key.pem -out ../src/cert.pem -sha256 -days 365 -nodes -subj "/C=CN/ST=B/L=B/O=B/OU=B/CN="${IEI_VISIBLE_OS_IP}
+fi
 
 # Start server
 if [ "$1" == "start" ]; then

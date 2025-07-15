@@ -15,19 +15,19 @@
 import argparse
 
 prompt_versions = {
-    "distribute": ["v1", "v2"],
-    "clientinfo": ["v1", "v2", "v3", "v4", "v5"],
-    "basicmedicalrecord": ["v1", "v2", "v3", "v4", "v5"],
-    "hospitalregister": ["v1", "v2", "v3", "v4", "v5", "v6"],
-    "diagnosis": ["v1", "v2"],
-    "examass": ["v1", "v2"],
-    "scheme": ["v1", "v2", "v3", "v4", "v5"],
-    "returnvisit": ["v1", "v2"],
-    "hospitalguide": ["v1", "v2", "v3", "v4"],
-    "doctormedicalrecord": ["v1", "v2", "v3"],
+    "distribute": ["v2"],
+    "clientinfo": ["v5"],
+    "basicmedicalrecord": ["v5"],
+    "hospitalregister": ["v6"],
+    "diagnosis": ["v2"],
+    "examass": ["v2"],
+    "scheme": ["v5"],
+    "returnvisit": ["v2"],
+    "hospitalguide": ["v4"],
+    "doctormedicalrecord": ["v3"],
     "inpatient": ["v1"],
-    "quality_inspect": ["v1", "v2"],
-    "quality_modify": ["v1", "v2"]
+    "quality_inspect": ["v2"],
+    "quality_modify": ["v2"]
 }
 
 voice_model = {

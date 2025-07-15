@@ -10,7 +10,7 @@ scheduler = BackgroundScheduler()
 
 def start_server():
     subprocess.run(
-        ["/bin/bash", "/home/workspace/seafarer_medical_ai/tianrui_inference/curl/new_inference/scripts/start-server.sh", "start"]
+        ["/bin/bash", "/home/workspace/medflow/scripts/start-server.sh", "start"]
     )
 
 def start_job():
