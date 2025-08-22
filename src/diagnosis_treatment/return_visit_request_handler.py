@@ -36,9 +36,10 @@ class ReturnVisitRequestHandler(BaseDiagnosisRequestHandler):
                  args,
                  scheme : None,
                  sub_scheme : None,
-                 request_type: None
+                 request_type: None,
+                 enable_think: False
                  ):
-        super().__init__(receive, args, scheme, sub_scheme, request_type)
+        super().__init__(receive, args, scheme, sub_scheme, request_type, enable_think)
         try:
             self.receive = RequestV7(**receive)
         except ValidationError as e:
@@ -102,7 +103,9 @@ class ReturnVisitRequestHandler(BaseDiagnosisRequestHandler):
         return params
 
     def format_return_visit(self, json_data, text_match):
-        answer = f"""{text_match}
+        #answer = f"""{text_match}
+        answer = "现在为您生成病情总结如下："
+        answer += f"""
 病情总结: {json_data['病情总结']}
 是否复诊：{json_data['是否复诊']}"""
         return answer

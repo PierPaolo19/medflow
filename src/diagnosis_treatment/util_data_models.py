@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Union
-from pydantic import BaseModel, Field
+from typing import Generic, List, TypeVar, Union
+
+from pydantic import BaseModel, Field, model_validator
+
+Inpatient = TypeVar("Inpatient")
 
 class HistoricalConversations(BaseModel):
     role: str = ""
@@ -387,3 +390,157 @@ class RequestV9(BaseModel):
     input: InputV9
     output: OutputV9 = Field(default_factory=OutputV9)
     chat: Chat  = Field(default_factory=Chat)
+
+
+# inpatient
+class AdmissionRecord(BaseModel):
+    patient_name: str = ""
+    patient_gender: str = ""
+    patient_age: str = ""
+    ethnicity: str = ""
+    occupation: str = ""
+    marital_status: str = ""
+    birthplace: str = ""
+    admission_time: str = ""
+    recording_time: str = ""
+    history_reporter: str = ""
+    chief_complaint: str = ""
+    history_of_present_illness: str = ""
+    past_medical_history: str = ""
+    physical_examination: PhyscialExamination = Field(default_factory=PhyscialExamination)
+    auxiliary_examination: str = ""
+    signature_of_physician: str = ""
+    initial_diagnosis: List[Diagnosis] = Field(default_factory=lambda: [Diagnosis()])
+
+class FirstPage(BaseModel):
+    medical_institution_name: str = ""
+    medical_institution_code: str = ""
+    patient_name: str = ""
+    patient_gender: str = ""
+    patient_age: str = ""
+    medical_record_number: str = ""
+    identify_number: str = ""
+    admission_date: str = ""
+    discharge_date: str = ""
+    admission_route: str = ""
+    discharge_method: str = ""
+    surgery_name: str = ""
+    surgery_date: str = ""
+    surgery_level: str = ""
+    wound_healing_grade: str = ""
+    medical_payment_method: str = ""
+    total_expenses: str = ""
+    signature_of_attending_physician: str = ""
+    signature_of_responsible_nurse: str = ""
+    signature_of_coder: str = ""
+    signature_of_department_director: str = ""
+    principal_diagnosis: List[Diagnosis] = Field(default_factory=lambda: [Diagnosis()])
+    other_diagnosis: List[Diagnosis] = Field(default_factory=lambda: [Diagnosis()])
+
+class ProgressNote(BaseModel):
+    recording_data: str = ""
+    change_in_condition: str = ""
+    examination_results: str = ""
+    therapeutic_measures: str = ""
+    reasons_for_medical_order_adjustment: str = ""
+    opinions_from_superior_physician_ward_round: str = ""
+    rescue_record: str = ""
+    signature_of_physician: str = ""
+
+class SurgicalRecord(BaseModel):
+    surgery_name: str = ""
+    surgery_date: str = ""
+    surgery_start_time: str = ""
+    surgery_end_time: str = ""
+    name_of_surgeon: str = ""
+    name_of_assistant_surgeon: str = ""
+    anesthesia_method: str = ""
+    name_of_anesthesiologist: str = ""
+    surgical_steps: str = ""
+    blood_loss_volume: str = ""
+    blood_transfusion_volume: str = ""
+    inventory_of_instruments_and_dressings: str = ""
+    postoperative_disposition: str = ""
+    signature_of_physician: str = ""
+    intraoperative_diagnosis: List[Diagnosis] = Field(default_factory=lambda: [Diagnosis()])
+
+class InformedConsentForm(BaseModel):
+    name_of_operation: str = ""
+    expected_benefits: str = ""
+    foreseeable_risks: str = ""
+    alternative_treatment_plans: str = ""
+    risk_response_measures: str = ""
+    patient_statement: str = ""
+    signature_of_patient: str = ""
+    signature_of_physician: str = ""
+    signing_date: str = ""
+
+class Notification(BaseModel):
+    patient_name: str = ""
+    basis_of_critical_condition: str = ""
+    prognostic_risks: str = ""
+    signature_of_informing_physician: str = ""
+    signature_of_recipient: str = ""
+    proof_of_relationship: str = ""
+    signing_date: str = ""
+    diagnosis: List[Diagnosis] = Field(default_factory=lambda: [Diagnosis()])
+
+class Discharge(BaseModel):
+    patient_name: str = ""
+    patient_gender: str = ""
+    patient_age: str = ""
+    hospitalization_number: str = ""
+    admission_date: str = ""
+    discharge_date: str = ""
+    length_of_hospital_stay: str = ""
+    admission_chief_complaint: str = ""
+    important_examination_results: str = ""
+    name_of_surgery: str = ""
+    discharge_condition: str = ""
+    discharge_instructions: str = ""
+    signature_of_physician: str = ""
+    discharge_diagnosis: List[Diagnosis] = Field(default_factory=lambda: [Diagnosis()])
+
+class InputInpatient(BaseModel, Generic[Inpatient]):
+    doctor_supplement: str
+    included_fields: list[str] | None = None
+    inpatient: Inpatient
+    @model_validator(mode="after")
+    def set_default(self):
+        if self.included_fields is None:
+            self.included_fields = list(self.inpatient.__class__.model_fields.keys())
+        return self
+
+class OutputInpatient(BaseModel, Generic[Inpatient]):
+    inpatient: Inpatient
+
+class RequestInpatient(BaseModel, Generic[Inpatient]):
+    input: InputInpatient[Inpatient]
+    output: OutputInpatient[Inpatient]
+    chat: Chat = Field(default_factory=Chat)
+
+def build_input(Inpatient):
+    class Input(InputInpatient[Inpatient]):
+        inpatient: Inpatient = Field(default_factory=Inpatient)
+    return Input
+
+def build_output(Inpatient):
+    class Output(OutputInpatient[Inpatient]):
+        inpatient: Inpatient = Field(default_factory=Inpatient)
+    return Output
+
+def build_request(Inpatient):
+    Input = build_input(Inpatient)
+    Output = build_output(Inpatient)
+    class Request(RequestInpatient[Inpatient]):
+        input: Input
+        output: Output = Field(default_factory=Output)
+    return Request
+
+RequestAdmissionRecord = build_request(AdmissionRecord)
+RequestFirstPage = build_request(FirstPage)
+RequestProgressNote = build_request(ProgressNote)
+RequestSurgicalRecord = build_request(SurgicalRecord)
+RequestInformedConsentForm = build_request(InformedConsentForm)
+RequestNotification = build_request(Notification)
+RequestDischarge = build_request(Discharge)

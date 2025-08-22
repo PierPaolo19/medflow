@@ -29,7 +29,7 @@ class PromptBasicMedicalRecord_v5(PromptTemplate):
             "patient_gender": self.ci_p.patient_gender,
             "patient_age": self.ci_p.patient_age,
             "reversed_patient_gender": gender_map.get(self.ci_p.patient_gender),
-            "format_basic_medical_record": self.format_basic_medical_record,
+            "format_basic_medical_record": format_basic_medical_record,
             "chief_complaint": self.bmr.chief_complaint,
             "history_of_present_illness": self.bmr.history_of_present_illness,
             "past_medical_history": self.bmr.past_medical_history,

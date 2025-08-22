@@ -216,44 +216,23 @@ format_assay="""{
 #处方
 format_prescription="""{
 "处方": [{
-    "药品编号": "YP123456",
     "药品名称": "维生素C片",
     "药品规格": "0.1g*100",
-    "厂家名称": "XXXXXXXX制药厂",
-    "开单数量": "10",
-    "开单单位": "粒",
     "用药途径": "口服",
-    "单次剂量": "1粒",
-    "持续天数": "7天",
-    "用药频次": "每日三次",
     "针对疾病": "",
     "药品作用": ""
 },
 {
-    "药品编号": "YP123457",
     "药品名称": "",
     "药品规格": "0.1g*100",
-    "厂家名称": "XXXXXXXX制药厂",
-    "开单数量": "10",
-    "开单单位": "粒",
     "用药途径": "口服",
-    "单次剂量": "1粒",
-    "持续天数": "7天",
-    "用药频次": "每日三次",
     "针对疾病": "",
     "药品作用": ""
 },
 {
-    "药品编号": "YP123458",
     "药品名称": "",
     "药品规格": "0.1g*100",
-    "厂家名称": "XXXXXXXX制药厂",
-    "开单数量": "10",
-    "开单单位": "粒",
     "用药途径": "口服",
-    "单次剂量": "1粒",
-    "持续天数": "7天",
-    "用药频次": "每日三次",
     "针对疾病": "",
     "药品作用": ""
 }]}
@@ -262,31 +241,17 @@ format_prescription="""{
 #输液
 format_transfusion="""{
 "输液": [{
-    "药品编号": "ZS123456",
     "药品名称": "维生素C注射液",
     "药品规格": "0.5g*10*2ml",
-    "厂家名称": "XXXXXXXX制药股份有限公司",
-    "开单数量": "1",
-    "开单单位": "支",
     "用药途径": "静脉滴注",
-    "单次剂量": "1支",
-    "持续天数": "1天",
-    "用药频次": "每日一次",
     "针对疾病": "",
     "药品作用": "",
     "输液分组": "第一组",
     "输液速度": "30gtt/min"
 },
 {
-    "药品编号": "ZS123457",
     "药品名称": "",
     "药品规格": "0.5g*10*2ml",
-    "厂家名称": "XXXXXXXX制药股份有限公司",
-    "开单数量": "1",
-    "开单单位": "支",
-    "用药途径": "静脉滴注",
-    "单次剂量": "1支",
-    "持续天数": "1天",
     "用药频次": "每日一次",
     "针对疾病": "",
     "药品作用": "",
@@ -478,34 +443,9 @@ format_return_visit="""{
 """
 
 #导诊
-format_hospital_guide1="""{
-"病历": {
-    "主诉": ""
-    },
-"推荐科室": [
-    {
-        "科室编号": "001",
-        "科室名称": "",
-        "是否儿科": ""
-    }]
-}
+format_hospital_guide1="""{"病历": {"主诉": ""},"推荐科室": [{"科室编号": "001","科室名称": "","是否儿科": ""}]}
 """
-format_hospital_guide2="""{
-"病历": {
-    "主诉": ""
-    },
-"推荐科室": [
-    {
-        "科室编号": "001",
-        "科室名称": "",
-        "是否儿科": ""
-    },
-    {
-        "科室编号": "002",
-        "科室名称": "",
-        "是否儿科": ""
-    }]
-}
+format_hospital_guide2="""{"病历": {"主诉": ""},"推荐科室": [{"科室编号": "001","科室名称": "","是否儿科": ""},{"科室编号": "002","科室名称": "","是否儿科": ""}]}
 """
 
 gender_map={"男": "女", "女": "男"}
@@ -524,6 +464,7 @@ medical_fields={
     "治疗":"cure",
     "医嘱":"doctor_advice"
 }
+
 reversed_medical_fields={v: k for k, v in medical_fields.items()}
 
 sub_medical_fields={
@@ -532,6 +473,7 @@ sub_medical_fields={
     "血压":"blood_pressure",
     "呼吸":"respiration"
 }
+
 reversed_sub_medical_fields={v: k for k, v in sub_medical_fields.items()}
 
 request_type_map={
@@ -544,8 +486,238 @@ request_type_map={
    "scheme": "v6",
    "returnvisit": "v7",
    "hospitalguide": "v8",
-   "doctormedicalrecord": "v9"
+   "doctormedicalrecord": "v9",
+   "inpatient": "inpatient",
 }
+
+format_admission_record = {
+   "姓名": "",
+   "性别": "",
+   "年龄": "",
+   "民族": "",
+   "职业": "",
+   "婚姻状况": "",
+   "出生地": "",
+   "入院时间": "",
+   "记录时间": "",
+   "病史陈述者": "",
+   "主诉": "",
+   "现病史": "",
+   "既往史": "",
+   "体格检查": {
+      "体温": "",
+      "脉搏": "",
+      "血压": "",
+      "呼吸": "",
+   },
+   "辅助检查": "",
+   "医师签名": "",
+   "初步诊断": [{"诊断名称": "", "诊断标识": ""}, {"诊断名称": "", "诊断标识": ""}]
+}
+
+format_first_page = {
+   "医疗机构名称": "",
+   "医疗机构代码": "",
+   "姓名": "",
+   "性别": "",
+   "年龄": "",
+   "病案号": "",
+   "身份证号": "",
+   "入院日期": "",
+   "出院日期": "",
+   "入院途径": "",
+   "出院方式": "",
+   "手术名称": "",
+   "手术日期": "",
+   "手术级别": "",
+   "切口愈合等级": "",
+   "医疗付费方式": "",
+   "总费用": "",
+   "主治医师签名": "",
+   "责任护士签名": "",
+   "编码员签名": "",
+   "科主任签名": "",
+   "主要诊断": [{"诊断名称": "", "诊断标识": ""}, {"诊断名称": "", "诊断标识": ""}],
+   "其他诊断": [{"诊断名称": "", "诊断标识": ""}, {"诊断名称": "", "诊断标识": ""}]
+}
+
+format_progress_note = {
+   "记录日期": "",
+   "病情变化": "",
+   "检查结果": "",
+   "诊疗措施": "",
+   "医嘱调整理由": "",
+   "上级医师查房意见": "",
+   "抢救记录": "",
+   "医师签名": ""
+}
+
+format_surgical_record = {
+   "手术名称": "",
+   "手术日期": "",
+   "手术开始时间": "",
+   "手术结束时间": "",
+   "术者姓名": "",
+   "助手姓名": "",
+   "麻醉方式": "",
+   "麻醉医师姓名": "",
+   "手术步骤": "",
+   "出血量": "",
+   "输血量": "",
+   "器械敷料清点": "",
+   "术后去向": "",
+   "医师签名": "",
+   "术中诊断": [{"诊断名称": "", "诊断标识": ""}, {"诊断名称": "", "诊断标识": ""}]
+}
+
+format_informed_consent = {
+   "操作/手术名称": "",
+   "预期获益": "",
+   "可预见风险": "",
+   "替代治疗方案": "",
+   "风险应对措施": "",
+   "患者声明": "",
+   "患者签名": "",
+   "医师签名": "",
+   "签署日期": "",
+}
+
+format_notification = {
+   "患者姓名": "",
+   "病危/重依据": "",
+   "预后风险": "",
+   "告知医师签名": "",
+   "接收方签名": "",
+   "关系证明": "",
+   "签署时间": "",
+   "诊断": [{"诊断名称": "", "诊断标识": ""}, {"诊断名称": "", "诊断标识": ""}]
+}
+
+format_discharge_summary = {
+   "姓名": "",
+   "性别": "",
+   "年龄": "",
+   "住院号": "",
+   "入院日期": "",
+   "出院日期": "",
+   "住院天数": "",
+   "入院主诉": "",
+   "重要检查结果": "",
+   "手术/操作名称": "",
+   "出院情况": "",
+   "出院医嘱": "",
+   "医师签名": "",
+   "出院诊断": [{"诊断名称": "", "诊断标识": ""}, {"诊断名称": "", "诊断标识": ""}]
+}
+
+format_inpatient_map = {
+   "format_admission_record": format_admission_record,
+   "format_first_page": format_first_page,
+   "format_progress_note": format_progress_note,
+   "format_surgical_record": format_surgical_record,
+   "format_informed_consent": format_informed_consent,
+   "format_notification": format_notification,
+   "format_discharge_summary": format_discharge_summary,
+   "format_discharge_record": format_discharge_summary
+}
+
+inpatient_fields = {
+   "姓名": "patient_name",
+   "性别": "patient_gender",
+   "年龄": "patient_age",
+   "民族": "ethnicity",
+   "职业": "occupation",
+   "婚姻状况": "marital_status",
+   "出生地": "birthplace",
+   "入院时间": "admission_time",
+   "记录时间": "recording_time",
+   "病史陈述者": "history_reporter",
+   "主诉": "chief_complaint",
+   "现病史": "history_of_present_illness",
+   "既往史": "past_medical_history",
+   "体格检查": "physical_examination",
+   "体温": "temperature",
+   "脉搏": "pulse",
+   "血压": "blood_pressure",
+   "呼吸": "respiration",
+   "辅助检查": "auxiliary_examination",
+   "医师签名": "signature_of_physician",
+   "初步诊断": "initial_diagnosis",
+   "诊断名称": "diagnosis_name",
+   "诊断标识": "diagnosis_identifier",
+
+   "医疗机构名称": "medical_institution_name",
+   "医疗机构代码": "medical_institution_code",
+   "病案号": "medical_record_number",
+   "身份证号": "identify_number",
+   "入院日期": "admission_date",
+   "出院日期": "discharge_date",
+   "入院途径": "admission_route",
+   "出院方式": "discharge_method",
+   "主要诊断": "principal_diagnosis",
+   "其他诊断": "other_diagnosis",
+   "手术名称": "surgery_name",
+   "手术日期": "surgery_date",
+   "手术级别": "surgery_level",
+   "切口愈合等级": "wound_healing_grade",
+   "医疗付费方式": "medical_payment_method",
+   "总费用": "total_expenses",
+   "主治医师签名": "signature_of_attending_physician",
+   "责任护士签名": "signature_of_responsible_nurse",
+   "编码员签名": "signature_of_coder",
+   "科主任签名": "signature_of_department_director",
+
+   "记录日期": "recording_data",
+   "病情变化": "change_in_condition",
+   "检查结果": "examination_results",
+   "诊疗措施": "therapeutic_measures",
+   "医嘱调整理由": "reasons_for_medical_order_adjustment",
+   "上级医师查房意见": "opinions_from_superior_physician_ward_round",
+   "抢救记录": "rescue_record",
+
+   "手术开始时间": "surgery_start_time",
+   "手术结束时间": "surgery_end_time",
+   "术者姓名": "name_of_surgeon",
+   "助手姓名": "name_of_assistant_surgeon",
+   "麻醉方式": "anesthesia_method",
+   "麻醉医师姓名": "name_of_anesthesiologist",
+   "手术步骤": "surgical_steps",
+   "出血量": "blood_loss_volume",
+   "输血量": "blood_transfusion_volume",
+   "器械敷料清点": "inventory_of_instruments_and_dressings",
+   "术后去向": "postoperative_disposition",
+   "术中诊断": "intraoperative_diagnosis",
+
+   "操作/手术名称": "name_of_operation",
+   "预期获益": "expected_benefits",
+   "可预见风险": "foreseeable_risks",
+   "替代治疗方案": "alternative_treatment_plans",
+   "风险应对措施": "risk_response_measures",
+   "患者声明": "patient_statement",
+   "患者签名": "signature_of_patient",
+   "签署日期": "signing_date",
+
+   "患者姓名": "patient_name",
+   "病危/重依据": "basis_of_critical_condition",
+   "预后风险": "prognostic_risks",
+   "告知医师签名": "signature_of_informing_physician",
+   "接收方签名": "signature_of_recipient",
+   "关系证明": "proof_of_relationship",
+   "签署时间": "signing_date",
+   "诊断": "diagnosis",
+
+   "住院号": "hospitalization_number",
+   "住院天数": "length_of_hospital_stay",
+   "入院主诉": "admission_chief_complaint",
+   "重要检查结果": "important_examination_results",
+   "手术/操作名称": "name_of_surgery",
+   "出院情况": "discharge_condition",
+   "出院医嘱": "discharge_instructions",
+   "出院诊断": "discharge_diagnosis",
+}
+
+reversed_inpatient_fields = {v: k for k, v in inpatient_fields.items()}
+
 
 #问候语
 greetings_prompt="您好，请详细描述您的症状，主要说明哪里不舒服，持续了多久。可以参考以下案例来描述：\
@@ -574,32 +746,8 @@ format_register_first_info = "我们为您推荐如下预约就诊"
 class PromptTemplate():
     def __init__(self) -> None:
         self.prompt = {}
-        self.format_distribute = format_distribute
-        self.format_client_select = format_client_select
-        self.format_client_info = format_client_info
-        self.format_basic_medical_record = format_basic_medical_record
-        self.format_department_single = format_department_single 
-        self.format_department_multi = format_department_multi
-        self.format_hospital_register = format_hospital_register
-        self.format_hospital_register_modify = format_hospital_register_modify
-        self.format_diagnose = format_diagnose
-        self.format_examine_assay = format_examine_assay
-        self.format_examine = format_examine
-        self.format_assay = format_assay
-        self.format_prescription = format_prescription
-        self.format_transfusion = format_transfusion
-        self.format_disposition = format_disposition
-        self.format_pick_therapy = format_pick_therapy
-        self.format_generate_therapy = format_generate_therapy
-        self.format_generate_medicine = format_generate_medicine
-        self.format_return_visit = format_return_visit
-        self.format_hospital_guide1 = format_hospital_guide1
-        self.format_hospital_guide2 = format_hospital_guide2
-        self.format_translate = format_translate
-        self.format_new_regiter_info = format_new_regiter_info
 
     def set_prompt(self):
-        self.prompt = {}
         return self.prompt
 
     def get_prompt(self, flag):

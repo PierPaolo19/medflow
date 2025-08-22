@@ -23,7 +23,7 @@ class PromptDistribute_v2(PromptTemplate):
 
     def set_prompt(self):
         self.variables = {
-            "format_distribute": self.format_distribute
+            "format_distribute": format_distribute
         }
         self.prompt = {
             "0": self.__set_distribute()

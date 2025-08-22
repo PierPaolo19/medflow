@@ -112,6 +112,25 @@ def create_interface_doctormedicalrecord():
         )
     return interface_doctormedicalrecord
 
+def create_interface_inpatient():
+    with gr.Blocks(analytics_enabled=False) as interface_inpatient:
+        build_nochat_tab(
+            module_name="inpatient",
+            json_data=inference_gradio_json_data['inpatient']['admission_record'],
+            prompt_name=prompt_versions["inpatient"],
+            module_label="住院文书",
+            btn_name="生成文书",
+            function=fetch_response_nochat,
+            use_branch=True,
+            branch_content={
+                "label":"Inpatient Type",
+                "value": "admission_record",
+                "choices": ["admission_record", "first_page", "progress_note", "surgical_record",
+                    "informed_consent", "notification", "discharge_summary", "discharge_record"]
+            }
+        )
+    return interface_inpatient
+
 def create_interface_examass():
     with gr.Blocks(analytics_enabled=False) as interface_examass:
         json_display, module, *_ = build_nochat_tab(
@@ -178,6 +197,15 @@ def create_interface_scheme():
                 use_branch=True,
                 branch_content={"label":"Therapy Id", "choices": ["1"], "value": "1"}
             )
+        with gr.TabItem("️✨ Test: 批量测试"):
+            build_nochat_tab(
+                module_name="scheme_test",
+                json_data=inference_gradio_json_data['scheme'],
+                prompt_name=prompt_versions["scheme"],
+                module_label="多方案",
+                btn_name="生成多方案",
+                function=fetch_response_generate_all_therapy
+            )
 
         send_btn.click(fetch_response_pick_scheme,
             inputs=[json_display, json_file, module],
@@ -199,6 +227,7 @@ interface_distribute = create_interface_distribute()
 interface_clientinfo = create_interface_clientinfo()
 interface_basicmedicalrecord = create_interface_basicmedicalrecord(json_display_diagnosis, diagnosis)
 interface_hospitalregister = create_interface_hospitalregister()
+interface_inpatient = create_interface_inpatient()
 
 interface_hospitalguide = create_interface_hospitalguide()
 interface_doctormedicalrecord = create_interface_doctormedicalrecord()

@@ -214,8 +214,8 @@ AND source_num > '0' ORDER BY date ASC, start_time ASC"
             "past_medical_history": self.bmr.past_medical_history,
             "personal_history": self.bmr.personal_history,
             "allergy_history": self.bmr.allergy_history,
-            "format_department_single": self.format_department_single,
-            "format_department_multi": self.format_department_multi,
+            "format_department_single": format_department_single,
+            "format_department_multi": format_department_multi,
             "department_all": self.department_all,
             "department_intro": self.department_intro
         }
@@ -235,7 +235,7 @@ AND source_num > '0' ORDER BY date ASC, start_time ASC"
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
         self.variables = {
             "search_register": self.search_register,
-            "format_hospital_register_modify": self.format_hospital_register_modify,
+            "format_hospital_register_modify": format_hospital_register_modify,
             "now": now
         }
         if self.search_register != []:
@@ -267,8 +267,8 @@ AND source_num > '0' ORDER BY date ASC, start_time ASC"
             "three_days_from_now_date": self.three_days_from_now_date,
             "current_register": self.current_register,
             "patient_intent": self.patient_intent,
-            "format_hospital_register_modify": self.format_hospital_register_modify,
-            "format_new_regiter_info": self.format_new_regiter_info,
+            "format_hospital_register_modify": format_hospital_register_modify,
+            "format_new_regiter_info": format_new_regiter_info,
             "confirmed": self.confirmed
         }
         system_str = self.prompt_manager.get_prompt("recognize_intent", 0, self.variables)
@@ -322,8 +322,8 @@ AND source_num > '0' ORDER BY date ASC, start_time ASC"
             "day_after_tomorrow_date": self.day_after_tomorrow_date,
             "three_days_from_now_date": self.three_days_from_now_date,
             "patient_intent": self.patient_intent,
-            "format_hospital_register": self.format_hospital_register,
-            "format_new_regiter_info": self.format_new_regiter_info,
+            "format_hospital_register": format_hospital_register,
+            "format_new_regiter_info": format_new_regiter_info,
             "confirmed": self.confirmed
         }
         system_str = self.prompt_manager.get_prompt("recognize_intent_with_registration_info", 0, self.variables)

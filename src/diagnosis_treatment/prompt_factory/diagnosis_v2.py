@@ -28,7 +28,7 @@ class PromptDiagnosis_v2(PromptTemplate):
 
     def set_prompt(self):
         self.variables = {
-            "format_diagnose": self.format_diagnose,
+            "format_diagnose": format_diagnose,
             "patient_name": self.ci_p.patient_name,
             "patient_gender": self.ci_p.patient_gender,
             "patient_age": self.ci_p.patient_age,

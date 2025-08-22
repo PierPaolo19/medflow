@@ -44,7 +44,7 @@ class PromptReturnVisit_v2(PromptTemplate):
             "physical_examination": self.physical_examination,
             "auxiliary_examination": self.bmr.auxiliary_examination,
             "diagnose_definite": self.diagnose_definite,
-            "format_return_visit": self.format_return_visit
+            "format_return_visit": format_return_visit
         }
         self.prompt = {
             "7": self.__set_return_visit()

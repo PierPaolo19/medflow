@@ -40,8 +40,9 @@ class TherapySchemeRequestHandler(BaseDiagnosisRequestHandler):
                  scheme : None, 
                  sub_scheme : None,
                  request_type: None,
+                 enable_think: False
                  ):
-        super().__init__(receive, args, scheme, sub_scheme,request_type)
+        super().__init__(receive, args, scheme, sub_scheme, request_type, enable_think)
         try:
             self.receive = RequestV6(**receive)
         except ValidationError as e:
@@ -57,8 +58,8 @@ class TherapySchemeRequestHandler(BaseDiagnosisRequestHandler):
         self.checker = TherapySchemeProcessChecker()
         self.flag = self.checker.check()
 
-    def generate_prompt(self, therapy_name):
-        prompt = get_prompt('PromptScheme', self.receive, self.scheme, self.sub_scheme, therapy_name)
+    def generate_prompt(self, therapy_name, scheme):
+        prompt = get_prompt('PromptScheme', self.receive, scheme, self.sub_scheme, therapy_name)
         prompt.set_prompt()
         return prompt
 
@@ -70,7 +71,7 @@ class TherapySchemeRequestHandler(BaseDiagnosisRequestHandler):
         match self.scheme:
             case "pick_therapy":
                 therapy_name = None
-                prompt = self.generate_prompt(therapy_name)
+                prompt = self.generate_prompt(therapy_name, self.scheme)
                 messages = self.preprocess(self.receive, prompt, self.flag)
                 answer = self.predict(messages, self.temprature, self.top_p)
                 self.results = self.postprocess_sm(self.receive, answer, self.scheme, self.sub_scheme, therapy_name)
@@ -80,12 +81,30 @@ class TherapySchemeRequestHandler(BaseDiagnosisRequestHandler):
                 def infer_func(item):
                     sema.acquire()
                     try:
-                        therapy_name = self.therapy_fields_reversed[item.therapy_name]
-                        prompt = self.generate_prompt(therapy_name)
-                        messages = self.preprocess(self.receive, prompt, self.flag)
-                        answer = self.predict(messages, self.temprature, self.top_p)
-                        with lock:
-                            self.results = self.postprocess_sm(self.receive, answer, self.scheme, self.sub_scheme, therapy_name)
+                        if item.therapy_name in self.therapy_fields_reversed:
+                            therapy_name = self.therapy_fields_reversed[item.therapy_name]
+                            if getattr(self.receive.output.generate_therapy[0].therapy_content, therapy_name) == list():
+                                prompt = self.generate_prompt(therapy_name, self.scheme)
+                                messages = self.preprocess(self.receive, prompt, self.flag)
+                                answer = self.predict(messages, self.temprature, self.top_p, False)
+                                with lock:
+                                    self.results = self.postprocess_sm(self.receive, answer, self.scheme, self.sub_scheme, therapy_name)
+                            match therapy_name:
+                                case "prescription":
+                                    if self.enable_think:
+                                        prompt = self.generate_prompt(None, "rectify_therapy_prescription")
+                                        messages = self.preprocess(self.receive, prompt, self.flag)
+                                        answer = self.predict(messages, self.temprature, self.top_p)
+                                        self.results = self.postprocess_sm(self.receive, answer, "rectify_therapy_prescription", self.sub_scheme, None)
+                                case "transfusion":
+                                    if self.enable_think:
+                                        prompt = self.generate_prompt(None, "rectify_therapy_transfusion")
+                                        messages = self.preprocess(self.receive, prompt, self.flag)
+                                        answer = self.predict(messages, self.temprature, self.top_p)
+                                        self.results = self.postprocess_sm(self.receive, answer, "rectify_therapy_transfusion", self.sub_scheme, None)
+                        else:
+                            self.results = self.receive
+                            print(f"Error: There is no matcing therapy_name {item.therapy_name}.")
                     finally:
                         sema.release()
                 if int(self.sub_scheme) in range(1, scheme_num+1, 1):
@@ -114,8 +133,8 @@ class TherapySchemeRequestHandler(BaseDiagnosisRequestHandler):
         hc_bak = params.chat.historical_conversations_bak
         if hc != [] and hc[-1].role == 'user':
             hc_bak.append(HistoricalConversations(role='user', content=hc[-1].content))
-        #hc.append(HistoricalConversations(role='assistant', content=answer))
-        #hc_bak.append(HistoricalConversations(role='assistant', content=answer))
+        hc.append(HistoricalConversations(role='assistant', content=answer))
+        hc_bak.append(HistoricalConversations(role='assistant', content=answer))
 
         json_match, text_match = extract_json_and_text(answer)
         if not isinstance(json_match, re.Match):
@@ -148,6 +167,51 @@ class TherapySchemeRequestHandler(BaseDiagnosisRequestHandler):
 
         elif scheme == "generate_therapy":
             setattr(params.output.generate_therapy[0], "therapy_name", "方案"+sub_scheme)
+            #if '处方' in json_data and json_data['处方']:
+            #    prescription_item = []
+            #    for item in json_data['处方']:
+            #        query_item = item['药品名称']
+            #        query_result = query_fastbm25(self.args.fastbm25_path, query_item, "prescription")
+            #        if self.args.fastbm25 and query_result:
+            #            query_item = query_result[0][0]
+            #            sql_str = f"SELECT id, drug_code, drug_name, drug_specification, pharmacy_unit, \
+            #                drug_formulation, COALESCE(alias, drug_name) AS name FROM prescription_info \
+            #                WHERE name=\"{query_item}\""
+            #            search_result = search_database(self.db_engine, sql_str)
+            #            prescription_item.append(PrescriptionContent(
+            #                drug_id=search_result[0][1],
+            #                drug_name=item['药品名称'],
+            #                drug_name_retrieve=search_result[0][2],
+            #                drug_specification=search_result[0][3],
+            #                manufacturer_name=item['厂家名称'],
+            #                order_quantity=str(item['开单数量']),
+            #                order_unit=item['开单单位'],
+            #                route_of_administration=search_result[0][5],
+            #                dosage=str(item['单次剂量']) if '单次剂量' in item.keys() else "",
+            #                duration=item['持续天数'],
+            #                frequency=item['用药频次'],
+            #                corresponding_diseases=item['针对疾病'],
+            #                drug_efficacy=item['药品作用']
+            #            ))
+            #                #order_unit=search_result[0][4],
+            #        else:
+            #            prescription_item.append(PrescriptionContent(
+            #                drug_id=item['药品编号'],
+            #                drug_name=item['药品名称'],
+            #                drug_name_retrieve="",
+            #                drug_specification=item['药品规格'],
+            #                manufacturer_name=item['厂家名称'],
+            #                order_quantity=str(item['开单数量']),
+            #                order_unit=item['开单单位'],
+            #                route_of_administration=item['用药途径'],
+            #                dosage=str(item['单次剂量']) if '单次剂量' in item.keys() else "",
+            #                duration=item['持续天数'],
+            #                frequency=item['用药频次'],
+            #                corresponding_diseases=item['针对疾病'],
+            #                drug_efficacy=item['药品作用']
+            #            ))
+            #    setattr(params.output.generate_therapy[0].therapy_content, "prescription", prescription_item)
+
             if '处方' in json_data and json_data['处方']:
                 prescription_item = []
                 for item in json_data['处方']:
@@ -164,34 +228,84 @@ class TherapySchemeRequestHandler(BaseDiagnosisRequestHandler):
                             drug_name=item['药品名称'],
                             drug_name_retrieve=search_result[0][2],
                             drug_specification=search_result[0][3],
-                            manufacturer_name=item['厂家名称'],
-                            order_quantity=str(item['开单数量']),
-                            order_unit=search_result[0][4],
+                            manufacturer_name="",
+                            order_quantity="",
+                            order_unit="",
                             route_of_administration=search_result[0][5],
-                            dosage=str(item['单次剂量']) if '单次剂量' in item.keys() else "",
-                            duration=item['持续天数'],
-                            frequency=item['用药频次'],
+                            dosage="",
+                            duration="",
+                            frequency="",
                             corresponding_diseases=item['针对疾病'],
                             drug_efficacy=item['药品作用']
                         ))
+                            #order_unit=search_result[0][4],
                     else:
                         prescription_item.append(PrescriptionContent(
-                            drug_id=item['药品编号'],
+                            drug_id="",
                             drug_name=item['药品名称'],
                             drug_name_retrieve="",
                             drug_specification=item['药品规格'],
-                            manufacturer_name=item['厂家名称'],
-                            order_quantity=str(item['开单数量']),
-                            order_unit=item['开单单位'],
+                            manufacturer_name="",
+                            order_quantity="",
+                            order_unit="",
                             route_of_administration=item['用药途径'],
-                            dosage=str(item['单次剂量']) if '单次剂量' in item.keys() else "",
-                            duration=item['持续天数'],
-                            frequency=item['用药频次'],
+                            dosage="",
+                            duration="",
+                            frequency="",
                             corresponding_diseases=item['针对疾病'],
                             drug_efficacy=item['药品作用']
                         ))
+                            #drug_id=item['药品编号'],
                 setattr(params.output.generate_therapy[0].therapy_content, "prescription", prescription_item)
 
+            #if '输液' in json_data and json_data['输液']:
+            #    transfusion_item = []
+            #    for item in json_data['输液']:
+            #        query_item = item['药品名称']
+            #        query_result = query_fastbm25(self.args.fastbm25_path, query_item, "prescription")
+            #        if self.args.fastbm25 and query_result:
+            #            query_item = query_result[0][0]
+            #            sql_str = f"SELECT id, drug_code, drug_name, drug_specification, pharmacy_unit, \
+            #                drug_formulation, COALESCE(alias, drug_name) AS name FROM prescription_info \
+            #                WHERE name=\"{query_item}\""
+            #            search_result = search_database(self.db_engine, sql_str)
+            #            transfusion_item.append(TransfusionContent(
+            #                drug_id=search_result[0][1],
+            #                drug_name=item['药品名称'],
+            #                drug_name_retrieve=search_result[0][2],
+            #                drug_specification=search_result[0][3],
+            #                manufacturer_name=item['厂家名称'],
+            #                order_quantity=str(item['开单数量']),
+            #                order_unit=item['开单单位'],
+            #                route_of_administration=search_result[0][5],
+            #                dosage=str(item['单次剂量']) if '单次剂量' in item.keys() else "",
+            #                duration=item['持续天数'],
+            #                frequency=item['用药频次'],
+            #                corresponding_diseases=item['针对疾病'],
+            #                drug_efficacy=item['药品作用'],
+            #                infusion_group=item['输液分组'] if '输液分组' in item.keys() else "",
+            #                infusion_rate=item['输液速度'] if '输液速度' in item.keys() else ""
+            #            ))
+            #                #order_unit=search_result[0][4],
+            #        else:
+            #            transfusion_item.append(TransfusionContent(
+            #                drug_id=item['药品编号'],
+            #                drug_name=item['药品名称'],
+            #                drug_name_retrieve="",
+            #                drug_specification=item['药品规格'],
+            #                manufacturer_name=item['厂家名称'],
+            #                order_quantity=str(item['开单数量']),
+            #                order_unit=item['开单单位'],
+            #                route_of_administration=item['用药途径'],
+            #                dosage=str(item['单次剂量']) if '单次剂量' in item.keys() else "",
+            #                duration=item['持续天数'],
+            #                frequency=item['用药频次'],
+            #                corresponding_diseases=item['针对疾病'],
+            #                drug_efficacy=item['药品作用'],
+            #                infusion_group=item['输液分组'] if '输液分组' in item.keys() else "",
+            #                infusion_rate=item['输液速度'] if '输液速度' in item.keys() else ""
+            #            ))
+            #    setattr(params.output.generate_therapy[0].therapy_content, "transfusion", transfusion_item)
             if '输液' in json_data and json_data['输液']:
                 transfusion_item = []
                 for item in json_data['输液']:
@@ -208,35 +322,36 @@ class TherapySchemeRequestHandler(BaseDiagnosisRequestHandler):
                             drug_name=item['药品名称'],
                             drug_name_retrieve=search_result[0][2],
                             drug_specification=search_result[0][3],
-                            manufacturer_name=item['厂家名称'],
-                            order_quantity=str(item['开单数量']),
-                            order_unit=search_result[0][4],
+                            manufacturer_name="",
+                            order_quantity="",
+                            order_unit="",
                             route_of_administration=search_result[0][5],
-                            dosage=str(item['单次剂量']) if '单次剂量' in item.keys() else "",
-                            duration=item['持续天数'],
-                            frequency=item['用药频次'],
+                            dosage="",
+                            duration="",
+                            frequency="",
                             corresponding_diseases=item['针对疾病'],
                             drug_efficacy=item['药品作用'],
-                            infusion_group=item['输液分组'] if '输液分组' in item.keys() else "",
-                            infusion_rate=item['输液速度'] if '输液速度' in item.keys() else ""
+                            infusion_group="",
+                            infusion_rate=""
                         ))
+                            #order_unit=search_result[0][4],
                     else:
                         transfusion_item.append(TransfusionContent(
-                            drug_id=item['药品编号'],
+                            drug_id="",
                             drug_name=item['药品名称'],
                             drug_name_retrieve="",
                             drug_specification=item['药品规格'],
-                            manufacturer_name=item['厂家名称'],
-                            order_quantity=str(item['开单数量']),
-                            order_unit=item['开单单位'],
+                            manufacturer_name="",
+                            order_quantity="",
+                            order_unit="",
                             route_of_administration=item['用药途径'],
-                            dosage=str(item['单次剂量']) if '单次剂量' in item.keys() else "",
-                            duration=item['持续天数'],
-                            frequency=item['用药频次'],
+                            dosage="",
+                            duration="",
+                            frequency="",
                             corresponding_diseases=item['针对疾病'],
                             drug_efficacy=item['药品作用'],
-                            infusion_group=item['输液分组'] if '输液分组' in item.keys() else "",
-                            infusion_rate=item['输液速度'] if '输液速度' in item.keys() else ""
+                            infusion_group="",
+                            infusion_rate=""
                         ))
                 setattr(params.output.generate_therapy[0].therapy_content, "transfusion", transfusion_item)
 
@@ -375,5 +490,49 @@ class TherapySchemeRequestHandler(BaseDiagnosisRequestHandler):
                         method_risk=item['潜在风险']
                     ))
                 setattr(params.output.generate_therapy[0].therapy_content, therapy_name, method_item)
+
+        elif scheme == "rectify_therapy_prescription":
+            former_prescription = params.output.generate_therapy[0].therapy_content.model_dump()['prescription']
+            new_prescription = json_data['处方']
+            former_drug_name = {item['drug_name_retrieve'] if item['drug_name_retrieve'] else item['drug_name']: item 
+                                for item in former_prescription}
+            new_drug_name = {item['药品名称']: item for item in new_prescription}
+            fields_to_replace = {
+                "order_unit":"开单单位",
+                "order_quantity":"开单数量",
+                "dosage":"单次剂量",
+                "duration":"持续天数",
+                "frequency":"用药频次"
+            }
+            prescription_item = []
+            for key, value in former_drug_name.items():
+                if key in new_drug_name.keys():
+                    for en, zh in fields_to_replace.items():
+                        former_drug_name[key][en] = new_drug_name[key][zh]
+                    prescription_item.append(PrescriptionContent.parse_obj(former_drug_name[key]))
+            setattr(params.output.generate_therapy[0].therapy_content, "prescription", prescription_item)
+
+        elif scheme == "rectify_therapy_transfusion":
+            former_transfusion = params.output.generate_therapy[0].therapy_content.model_dump()['transfusion']
+            new_transfusion = json_data['输液']
+            former_drug_name = {item['drug_name_retrieve'] if item['drug_name_retrieve'] else item['drug_name']: item 
+                                for item in former_transfusion}
+            new_drug_name = {item['药品名称']: item for item in new_transfusion}
+            fields_to_replace = {
+                "order_unit":"开单单位",
+                "order_quantity":"开单数量",
+                "dosage":"单次剂量",
+                "duration":"持续天数",
+                "frequency":"用药频次",
+                "infusion_group":"输液分组",
+                "infusion_rate":"输液速度"
+            }
+            transfusion_item = []
+            for key, value in former_drug_name.items():
+                if key in new_drug_name.keys():
+                    for en, zh in fields_to_replace.items():
+                        former_drug_name[key][en] = new_drug_name[key][zh]
+                    transfusion_item.append(TransfusionContent.parse_obj(former_drug_name[key]))
+            setattr(params.output.generate_therapy[0].therapy_content, "transfusion", transfusion_item)
 
         return params

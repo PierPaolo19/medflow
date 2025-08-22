@@ -224,6 +224,9 @@ class QualityModify:
             top_p=top_p,
             max_tokens=1024, 
             stop="<|eot_id|>",
+            extra_body={
+                "chat_template_kwargs": {"enable_thinking": False},
+            },
         )
 
         answer=""
