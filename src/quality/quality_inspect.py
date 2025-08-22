@@ -255,7 +255,7 @@ class QualityInspect:
             "脉搏": "input.basic_medical_record.physical_examination.pulse",
             "血压": "input.basic_medical_record.physical_examination.blood_pressure",
             "呼吸": "input.basic_medical_record.physical_examination.respiration",
-            "辅助检查": "input_request.basic_medical_record.auxiliary_examination"
+            "辅助检查": "input.basic_medical_record.auxiliary_examination"
         }
         if control_quality.item not in [None, "", "空"]:
             control_quality.field_path = field_path_map.get(control_quality.item)
