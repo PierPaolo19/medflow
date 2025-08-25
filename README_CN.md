@@ -3,21 +3,19 @@
 青囊慧诊全流程AI医疗框架<br>
 <a>（Qingnang Smart Diagnosis - MedFlow All - Process Medical Framework）</a>
 </h1>
-
 </div>
 
 <div align="center">
 
-    
   <a href="code_license">
-    <img alt="Code License" src="https://img.shields.io/badge/Apache%202.0%20-green?style=flat&label=Code%20License&link=#"/>
+​    <img alt="Code License" src="https://img.shields.io/badge/Apache%202.0%20-green?style=flat&label=Code%20License&link=#"/>
   </a>
   <a href="model_license">
-    <img alt="Model License" src="https://img.shields.io/badge/Apache%202.0%20-green?style=flat&label=Model%20License&link=#" />
+​    <img alt="Model License" src="https://img.shields.io/badge/Apache%202.0%20-green?style=flat&label=Model%20License&link=#" />
   </a>
-  
+
  | [English](README.md) | [中文](README_CN.md) |
- 
+
 </div>
 
 
@@ -65,8 +63,11 @@
 | Qingnang-TTS |    GPT-Sovits2    |    HuggingFace    | [ModelScope](https://www.modelscope.cn/models/MedFlow/Qingnang-TTS)
 
 
-我们微调和增强训练后的Qingnang医疗大语言模型在【医学专业能力】及【对话交互能力】均有所提升。采用MedBench权威医疗评测基准，医疗专业能力比训练前提高1.27%~80.17%；采用临床数据形成对话评测集，对话交互能力比训练前提高0.95%~85.65%，指标详情参见docs/Comparison_result.md，技术报告见docs/Qingnang.pdf。
+我们微调和增强训练后的Qingnang医疗大语言模型在【医学专业能力】及【对话交互能力】均有所提升。
++ 采用MedBench权威医疗评测基准，医疗专业能力比训练前提高1.27%~80.17%；
++ 采用临床数据形成对话评测集，对话交互能力比训练前提高0.95%~85.65%；
 
+指标详情参见：[Comparison_result.md](./docs/Comparison_result.md)。
 
 
 ##  3. Main Features
@@ -86,18 +87,18 @@
 |   功能     |  环节  | 类型  |  使用者  |
 | :----------: |:---------------: |:---------------: |:---------------: |
 | 患者建档  | 诊前 |对话交互 |  患者、医院  |
-| 智能挂号  | 诊前  |对话交互 |  患者、医院  |
 | 症状预问诊  | 诊前  |对话交互 |  患者、医生  |
-| 导诊科室推荐  | 诊前  |对话交互 |  患者、医院  |
-| 病历质检⭐️  | 诊中  |对话交互、临床推断 |  医生、医院 |
+| 推荐科室  | 诊前  |对话交互 |  患者、医院  |
+| 智能挂号  | 诊前  |对话交互 |  患者、医院  |
 | 病历生成⭐️  | 诊中  |对话交互|  医生  |
 | 病历生成-专科⭐️  | 诊中  |对话交互、临床推断 |  医生  |
+| 病历质检⭐️  | 诊中  |对话交互、临床推断 |  医生、医院 |
 | 疾病诊断⭐️  | 诊中  |临床推断 |  医生  |
-| 药品建议⭐️ | 诊中  |临床推断 |  医生  |
-| 检查开具⭐️ | 诊中  |临床推断 |  医生  |
-| 处方生成⭐️ | 诊中  |对话交互、临床推断 |  医生  |
+| 检查检验开具⭐️ | 诊中  |临床推断 |  医生  |
 | 治疗方案⭐️  | 诊中  |对话交互、临床推断 |  医生  |
+| 住院文书⭐️  | 诊中  |对话交互、临床推断 |  医生  |
 | 随访管理⭐️  | 诊后  |对话交互 |  患者、医院  |
+| 患者复诊⭐️  | 诊后  |对话交互 |  患者、医院  |
 
 
 ##  4. Quick Start
@@ -119,7 +120,7 @@ sudo docker run -itd --name <container_name> -v /home/<username>:/home/workspace
 **代码下载**
 
 ```bash
-git clone -b develop https://github.com/MedFlow2025/medflow.git
+git clone -b dev https://github.com/MedFlow2025/medflow.git
 ```
 
 **依赖安装**
@@ -145,24 +146,25 @@ http://<openai ip>:<openai port>/v1
 
 **数据准备（可选）**
 
-我们提供了自定义知识库导入功能，包括诊断、药品、检查单等，具体示例请参考[data](./data)目录，使用方法可以参考[数据准备说明文档](./docs/data_preparation.md)，可运行如下脚本。
+我们提供了自定义知识库导入功能，包括诊断、药品、检查单等，具体示例请参考使用方法可以参考[数据准备说明文档](./docs/data_preparation.md)，可运行如下脚本。
 
 ```bash
+cd data
 python3 create_database.py
 ```
 
-我们提供了自定义质检规则的功能，具体示例请参考 quality/quality.json 文件，修改重启即可生效。
+我们提供了自定义质检规则的功能，具体示例请参考[quality_base.json](./data/raw/json/quality/quality_base.json)和[quality.json](./data/raw/json/quality/quality.json)文件，修改重启即可生效。
 
 **服务启动**
 
 ```bash
-python3 inference.py --model <model_name> --model-url http://<openai ip>:<port>/v1 --fastbm25 --log --host <server ip> --port <server port> --max-round 30 --database ../data/processed/database
+python3 inference.py --model <model_name> --model-url http://<openai ip>:<port>/v1 --host <server ip> --port <server port> --max-tokens 4096
 ```
 
 **webui界面启动**
 
 ```bash
-python3 inference_gradio.py --host <server ip> --port <server port> --gradio-port <webui port> --model <model_name>
+python3 inference_ui.py --host <server ip> --port <server port> --gradio-port <webui port> --model <model_name>
 ```
 
 **4.3  功能体验**
@@ -176,31 +178,37 @@ python3 inference_gradio.py --host <server ip> --port <server port> --gradio-por
 cd ./tests
 
 #对话生成患者建档
-bash test-clientinfo.sh
+bash test-clientinfo.sh <server ip> <server port>
 
 #对话生成导诊
-bash test-hospitalguide.sh
+bash test-hospitalguide.sh <server ip> <server port>
 
 #对话生成预问诊报告
-bash test-basicmedicalrecord.sh
+bash test-basicmedicalrecord.sh <server ip> <server port>
 
 #对话生成挂号
-bash test-register.sh
+bash test-register.sh <server ip> <server port>
 
 #生成诊断
-bash test-diagnosis.sh
+bash test-diagnosis.sh <server ip> <server port>
 
 #生成检查和化验
-bash test-examineassay.sh
+bash test-examineassay.sh <server ip> <server port>
 
 #生成治疗方案
-bash test-therapyscheme.sh
+bash test-therapyscheme.sh <server ip> <server port>
 
 #对话生成复诊
-bash test-returnvisit.sh
+bash test-returnvisit.sh <server ip> <server port>
 
 #生成病历
-bash test-doctormedicalrecord.sh
+bash test-doctormedicalrecord.sh <server ip> <server port>
+
+#生成住院文书
+bash test inpatient.sh <server ip> <server port>
+
+#生成随访
+bash test followup.sh <server ip> <server port>
 ```
 
 **界面体验**

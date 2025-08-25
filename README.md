@@ -2,12 +2,10 @@
 <h1>
 Qingnang Smart Diagnosis - MedFlow All - Process Medical Framework
 </h1>
-
 </div>
 
 <div align="center">
 
-    
   <a href="code_license">
     <img alt="Code License" src="https://img.shields.io/badge/Apache%202.0%20-green?style=flat&label=Code%20License&link=#"/>
   </a>
@@ -62,6 +60,11 @@ Our fine-tuned and enhanced medical large language models, along with voice inte
 | Qingnang-ASR |    Whisper V3    |    HuggingFace    | [ModelScope](https://www.modelscope.cn/models/MedFlow/Qingnang-ASR)
 | Qingnang-TTS |    GPT-Sovits2    |    HuggingFace    | [ModelScope](https://www.modelscope.cn/models/MedFlow/Qingnang-TTS)
 
+After fine-tuning and enhanced training, our Medical Large Language Model A has achieved improvements in both medical professional capabilities and conversational interaction capabilities.
++ Using the authoritative medical evaluation benchmark MedBench, its medical professional capabilities have increased by 1.27% to 80.17% compared with the pre-training level.
++ Using clinical data to form a conversational evaluation dataset, its conversational interaction capabilities have increased by 0.95% to 85.65% compared with the pre-training level.
+
+For detailed indicators, please refer to [Comparison_result.md](./docs/Comparison_result.md).
 
 ##  3. Main Features
 
@@ -82,20 +85,19 @@ Critical workflows achieve over 95% accuracy.
 |   Function     |  Process Stage  | Type  |  Users  |
 | :----------: |:---------------: |:---------------: |:---------------: |
 | Patient Registration  | Pre-consultation | Dialogue Interaction |  Patients, Hospitals  |
-| Intelligent Appointment  | Pre-consultation  | Dialogue Interaction |  	Patients, Hospitals  |
 | Symptom Pre-Consultation  | Pre-consultation  | Dialogue Interaction |  Patients, Physicians  |
 | Department Recommendation  | Pre-consultation  | Dialogue Interaction |  Patients, Hospitals  |
-| Medical Record QC  | In-consultation  | Dialogue Interaction & Clinical Inference |  Physicians, Hospitals  |
+| Intelligent Appointment  | Pre-consultation  | Dialogue Interaction |  	Patients, Hospitals  |
 | Medical Record Generation  | In-consultation  | Dialogue Interaction |  Physicians  |
 | Specialist Record Gen.  | In-consultation  | Dialogue Interaction & Clinical Inference |  Physicians  |
+| Medical Record QC  | In-consultation  | Dialogue Interaction & Clinical Inference |  Physicians, Hospitals  |
 | Disease Diagnosis  | In-consultation  |  Clinical Inference  |  Physicians  |
-| Medication Recommendations  |  In-consultation  |  Clinical Inference |  Physicians  |
 | Medical Test Ordering  | In-consultation  |  Clinical Inference  | Physicians   |
-| Prescription Generation  | In-consultation   |  Dialogue Interaction & Clinical Inference |  Physicians  |
 | Treatment Plan Development  | 	In-consultation	  |  Dialogue Interaction & Clinical Inference  |  Physicians  |
+| Inpatient Documents  | 	In-consultation	  |  Dialogue Interaction & Clinical Inference  |  Physicians  |
 | Follow-up Management  | Post-consultation  |  Dialogue Interaction  |  Patients, Hospitals  |
+| Follow-up Visit | Post-consultation  |  Dialogue Interaction  |  Patients, Hospitals  |
 
-			
 
 ##  4. Quick Start
 
@@ -116,7 +118,7 @@ sudo docker run -itd --name <container_name> -v /home/<username>:/home/workspace
 **Code Download**
 
 ```bash
-git clone -b develop https://github.com/MedFlow2025/medflow.git
+git clone -b dev https://github.com/MedFlow2025/medflow.git
 ```
 
 **Dependency Installation**
@@ -142,24 +144,25 @@ http://<openai ip>:<openai port>/v1
 
 **Data Preparation (Optional)**
 
-We offer a function to import a custom knowledge base, which includes information about diagnoses, medicines, examination forms, etc. For specific examples, please refer to the ./database directory. You can run the following script:
+We offer a function to import a custom knowledge base, which includes information about diagnoses, medicines, examination forms, etc. For specific examples, please refer to the [data_preparation.md](./docs/data_preparation.md). You can run the following script:
 
 ```bash
+cd data
 python3 create_database.py
 ```
 
-We also provide a function to customize quality inspection rules. For specific examples, please refer to the quality/quality.json file. The changes will take effect after you modify the file and restart the service.
+We also provide a function to customize quality inspection rules. For specific examples, please refer to the [quality_base.json](./data/raw/json/quality/quality_base.json) and [quality.json](./data/raw/json/quality/quality.json) file. The changes will take effect after you modify the file and restart the service.
 
 **Service Startup**
 
 ```bash
-python3 inference.py --model <model_name> --model-url http://<openai ip>:<port>/v1 --fastbm25 --log --host <server ip> --port <server port> --max-round 30 --database ../data/processed/database
+python3 inference.py --model <model_name> --model-url http://<openai ip>:<port>/v1 --host <server ip> --port <server port> --max-tokens 4096
 ```
 
 **WebUI Interface Startup**
 
 ```bash
-python3 inference_gradio.py --host <server ip> --port <server port> --gradio-port <webui port> --model <model_name>
+python3 inference_ui.py --host <server ip> --port <server port> --gradio-port <webui port> --model <model_name>
 ```
 
 **4.3 Function Experience**
@@ -167,37 +170,43 @@ python3 inference_gradio.py --host <server ip> --port <server port> --gradio-por
 
 **Request Testing**
 
-We provide documentation for curl request testing and scripts in the  [example](./examples) directory. For detailed usage instructions, please refer to the [curl request instruction document](./docs/pretrain.md)..
+We provide documentation for curl request testing and scripts in the  [tests](./tests) directory. For detailed usage instructions, please refer to the [curl request instruction document](./docs/tests.md)..
 
 ```bash
 cd ./tests
 
 # Dialogue Generation for Patient Registration
-bash test-clientinfo.sh
+bash test-clientinfo.sh <server ip> <server port>
 
 # Dialogue Generation for Medical Guidance
-bash test-hospitalguide.sh
+bash test-hospitalguide.sh <server ip> <server port>
 
 # Dialogue Generation for Pre - consultation Report
-bash test-basicmedicalrecord.sh
+bash test-basicmedicalrecord.sh <server ip> <server port>
 
 # Dialogue Generation for Appointment Booking
-bash test-register.sh
+bash test-register.sh <server ip> <server port>
 
 # Diagnosis Generation
-bash test-diagnosis.sh
+bash test-diagnosis.sh <server ip> <server port>
 
 # Generation of Examinations and Tests
-bash test-examineassay.sh
+bash test-examineassay.sh <server ip> <server port>
 
 # Generation of Treatment Plan
-bash test-therapyscheme.sh
+bash test-therapyscheme.sh <server ip> <server port>
 
-# Dialogue Generation for return Visit
-bash test-returnvisit.sh
+# Dialogue Generation for Return Visit
+bash test-returnvisit.sh <server ip> <server port>
 
 # Medical Record Generation
-bash test-doctormedicalrecord.sh
+bash test-doctormedicalrecord.sh <server ip> <server port>
+
+# Generation of Inpatient Documents
+bash test inpatient.sh <server ip> <server port>
+
+# Follow-up
+bash test followup.sh <server ip> <server port>
 ```
 
 **Webui Experience**
