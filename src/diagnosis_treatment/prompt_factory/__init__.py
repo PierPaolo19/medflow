@@ -19,6 +19,7 @@ from .distribute_v2 import *
 from .doctormedicalrecord_v3 import *
 from .examass_v2 import *
 from .hospitalguide_v4 import *
+from .hospitalguide_v5 import *
 from .hospitalregister_v6 import *
 from .returnvisit_v2 import *
 from .scheme_v5 import *

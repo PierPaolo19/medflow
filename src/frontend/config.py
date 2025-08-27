@@ -23,7 +23,7 @@ prompt_versions = {
     "examass": ["v2"],
     "scheme": ["v5"],
     "returnvisit": ["v2"],
-    "hospitalguide": ["v4"],
+    "hospitalguide": ["v4", "v5"],
     "doctormedicalrecord": ["v3"],
     "inpatient": ["v1"],
     "quality_inspect": ["v2"],

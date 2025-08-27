@@ -742,6 +742,7 @@ stop_sign = [
 
 format_new_regiter_info = "新挂号"
 format_register_first_info = "我们为您推荐如下预约就诊"
+department_recommend = "正在为您推荐合适的科室。请稍等片刻。"
 
 class PromptTemplate():
     def __init__(self) -> None:
