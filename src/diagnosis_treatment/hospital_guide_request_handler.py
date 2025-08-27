@@ -167,15 +167,13 @@ class HospitalGuideRequestHandler(BaseDiagnosisRequestHandler):
     def department_recommend(self, params):
         #全部科室简介
         if int(params.input.client_info[0].patient.patient_age) < 6:
-            department_intro = department_introduction(self.args.department_path, if_child=1)
+            department_intro = load_department(self.args.department_path, if_child=1)
         else:
-            department_intro = department_introduction(self.args.department_path)
+            department_intro = load_department(self.args.department_path)
 
         #分组科室
         group_size = 5
         groups = [department_intro[i:i+group_size] for i in range(0, len(department_intro), group_size)]
-        print(f'{group_size=}')
-        print(f'{len(groups)=}')
 
         all_scores = {}
         group_responses = []
@@ -226,13 +224,12 @@ class HospitalGuideRequestHandler(BaseDiagnosisRequestHandler):
                 score_dict = json.loads(json_str)
 
                 # 匹配科室名称（允许部分匹配）
-                for item in group:
-                    for dept_name, intro in item.items():
-                        # 检查完整名称或部分匹配
-                        for resp_dept, score in score_dict.items():
-                            if dept_name in resp_dept or resp_dept in dept_name:
-                                scores[dept_name] = float(score)
-                                break
+                for dept_name, intro in group:
+                    # 检查完整名称或部分匹配
+                    for resp_dept, score in score_dict.items():
+                        if dept_name in resp_dept or resp_dept in dept_name:
+                            scores[dept_name] = float(score)
+                            break
         except json.JSONDecodeError:
                 print("JSON解析失败，尝试行格式解析")
 
@@ -247,17 +244,15 @@ class HospitalGuideRequestHandler(BaseDiagnosisRequestHandler):
                     score = float(match.group(2))
 
                     # 找到最匹配的实际科室名称
-                    for item in group:
-                        for dept_name, intro in item.items():
-                            if dept_name in resp_dept or resp_dept in dept_name:
-                                scores[dept_name] = score
-                                break
+                    for dept_name, intro in group:
+                        if dept_name in resp_dept or resp_dept in dept_name:
+                            scores[dept_name] = score
+                            break
 
         # 确保所有科室都有分数，未评分的默认为0
-        for item in group:
-            for dept_name, intro in item.items():
-                if dept_name not in scores:
-                    scores[dept_name] = 0.0
+        for dept_name, intro in group:
+            if dept_name not in scores:
+                scores[dept_name] = 0.0
 
         # 对每个科室应用权重调整
         adjusted_scores = {}

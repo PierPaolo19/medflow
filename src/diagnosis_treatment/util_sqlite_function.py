@@ -91,3 +91,14 @@ def department_introduction(department_path, if_child: bool = 0):
         department_intro = [{item['department_name']: item['introduction']} for item in all_department['all_department']
             if (item['introduction'] != "" and item['if_child'] == 1)]
     return department_intro
+
+def load_department(department_path, if_child: bool = 0):
+    with open(department_path, "r") as f:
+        all_department = json.load(f)
+    if if_child == 0:
+        department_intro = [(item['department_name'], item['introduction']) for item in all_department['all_department']
+            if (item['introduction'] != "" and item['if_child'] == 0)]
+    else:
+        department_intro = [(item['department_name'], item['introduction']) for item in all_department['all_department']
+            if (item['introduction'] != "" and item['if_child'] == 1)]
+    return department_intro

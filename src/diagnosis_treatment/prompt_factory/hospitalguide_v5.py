@@ -26,11 +26,7 @@ class PromptHospitalGuide_v5(PromptTemplate):
         self.bmr = receive.output.basic_medical_record
         self.db_engine = db_engine
         self.scheme = scheme
-        if group != []:
-            for item in group:
-                self.group = [(f"{k}[{v}]" if v else k for k, v in item.items())]
-        else:
-            self.group = group
+        self.group = [f"{name}[{intro}]" if intro else name for name, intro in group]
 
     def set_prompt(self):
         self.variables = {
