@@ -112,6 +112,7 @@ class BasicMedicalRecordRequestHandler(BaseDiagnosisRequestHandler):
     def format_basic_medical_record(self, json_data, text_match):
         #answer = f"""{text_match}
         answer = f"""依据您回复的情况，已经为您生成了预问诊报告，如无问题，请点击确认，如还需要补充请直接回复补充。
+
 主诉: {json_data['主诉']}
 现病史: {json_data['现病史']}
 既往史: {json_data['既往史']}
