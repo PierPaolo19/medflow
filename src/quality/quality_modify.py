@@ -215,7 +215,8 @@ class QualityModify:
         return modify_control_quality_data(response,  modify_key, modify_val)
 
 
-    async def async_predict(self, messages:str, temp:float = 0, top_p:float = 1) -> str:
+    #async def async_predict(self, messages:str, temp:float = 0, top_p:float = 1) -> str:
+    async def async_predict(self, messages:str, temp:float = 0, top_p:float = 1):
         stream = await self.async_client.chat.completions.create(
             model = self.model_name,
             messages=messages,
@@ -229,21 +230,34 @@ class QualityModify:
             },
         )
 
-        answer=""
+        #answer=""
+        #async for completion in stream:
+        #    answer+= (completion.choices[0].delta.content or "" )
+        #return answer
         async for completion in stream:
-            answer+= (completion.choices[0].delta.content or "" )
-
-        return answer
+            content = completion.choices[0].delta.content
+            if content is not None:
+                yield  content
     
-    async def async_process_queries(self) -> QualityAPIResponse:
+    #async def async_process_queries(self) -> QualityAPIResponse:
+    async def async_process_queries(self):
         if self.input_request.confirm_auto_modify:
             response = self.confirm_auto_modify_request()
             response_output = QualityAPIResponseOutput()
             response_output.output = response
-            return response_output            
+            #return response_output
+            response_output = response_output.model_dump()
+            response_output = json.dumps(response_output, ensure_ascii=False)
+            yield response_output
+            return
         
         query = self.__get_quality_modify_message()
-        results = await self.async_predict(messages=query)
+        #results = await self.async_predict(messages=query)
+        results = ""
+        async for re in self.async_predict(messages=query):
+            results += re
+            #print(results)
+            yield re
 
         response = QualityAPIResponse(**self.input_request.dict()) 
         
@@ -265,4 +279,8 @@ class QualityModify:
 
         response_output.chat.historical_conversations.append(historical_conversation_new)
         
-        return response_output
+        #return response_output
+        response_output = response_output.model_dump()
+        response_output = json.dumps(response_output, ensure_ascii=False)
+        yield response_output
+        return

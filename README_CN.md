@@ -21,7 +21,8 @@
 
 ##  0. Latest News 🎉🎉
 
-* [2025-03-28] 发布青囊慧诊全流程AI医疗框架
+* [2025-03-28] 发布青囊慧诊全流程AI医疗框架。
+* [2025-09-16] 更新web界面，支持ASR与TTS。
 
 
 ##  1. Introduction
@@ -39,6 +40,7 @@
 + 多角色支持：功能点全面，支持医、患、管三方技能，能为医院、医生、患者带来便利
 
 **技术优势**
+
 + 精心调优过的Prompt指令和推理业务编排
 + 提供大模型意图识别、意图回退、SQL分发接口、多路召回等技术配合的落地解决方案
 + 效果先行，提供的意图、检索、数据库等技术示例，含有应用技巧且非常轻量级，便于二次开发和升级
@@ -163,9 +165,37 @@ python3 inference.py --model <model_name> --model-url http://<openai ip>:<port>/
 
 **webui界面启动**
 
-```bash
-python3 inference_ui.py --host <server ip> --port <server port> --gradio-port <webui port> --model <model_name>
-```
+1. 安装依赖
+
+   ```
+   cd web
+   apt-get update && apt-get install npm mkcert
+   npm install --production
+   ```
+
+2. 生成本地CA：
+
+   参数 `${ip} ` 需要更改为实际ip
+
+   ```
+   mkcert -key-file key.pem -cert-file cert.pem ${ip}
+   ```
+
+3. 启动服务
+
+   确保推理服务和语音服务已经启动，并修改脚本中的`host`、`port`、`inferport`、`voiceport`参数，运行：
+
+   ```
+   node server.js
+   ```
+
+> 备注：
+>
+> 旧版界面按如下命令启动：
+>
+> ```bash
+> python3 inference_ui.py --host <server ip> --port <server port> --gradio-port <webui port> --model <model_name>
+> ```
 
 **4.3  功能体验**
 
@@ -215,11 +245,18 @@ bash test followup.sh <server ip> <server port>
 
 可打开webui界面启动后的提示网址，体验各模块的功能：
 ```bash
-http://<webui ip>:<webui port>
+https://<webui ip>:<webui port>
 ```
-<div align="center">
-  <img src="./assets/webui.png">
-</div>
+
+![image-20250916151956339](assets/image-inquiry.png)
+
+![image-20250916152131215](assets/image-qualityInspect.png)
+
+![image-20250916152738651](assets/image-diagnosis.png)
+
+![image-20250916153658561](assets/image-therapy.png)
+
+
 
 ##  5. Statement of Agreement
 

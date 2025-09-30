@@ -29,7 +29,7 @@ from quality.quality_common_ds import QualityAPIRequestInput
 from quality.quality_inspect import QualityInspect
 from quality.quality_modify import QualityModify
 from quality.util import handle_quality
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 
 
 from diagnosis_treatment.client_info_request_handler import ClientInfoRequestHandler
@@ -145,9 +145,15 @@ async def qulity_modify(
     if input_chat:
         historical_conversations = input_chat.historical_conversations
     quality_modify = QualityModify(input_request, historical_conversations, args.api_key, args.model_url, args.model, async_client=g_async_client, prompt_conf = get_config())
-    results = await quality_modify.async_process_queries()
-    json_compatible_data = jsonable_encoder(results, exclude_none = True)
-    return JSONResponse(content=json_compatible_data)
+    #results = await quality_modify.async_process_queries()
+    #json_compatible_data = jsonable_encoder(results, exclude_none = True)
+    #return JSONResponse(content=json_compatible_data)
+
+    async def event_stream():
+        async for chunk in quality_modify.async_process_queries():
+            yield chunk
+
+    return StreamingResponse(event_stream(), media_type="application/json")
 
 
 @app.post("/inference")

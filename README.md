@@ -5,7 +5,6 @@ Qingnang Smart Diagnosis - MedFlow All - Process Medical Framework
 </div>
 
 <div align="center">
-
   <a href="code_license">
     <img alt="Code License" src="https://img.shields.io/badge/Apache%202.0%20-green?style=flat&label=Code%20License&link=#"/>
   </a>
@@ -20,6 +19,7 @@ Qingnang Smart Diagnosis - MedFlow All - Process Medical Framework
 ##  0. Latest News 🎉🎉
 
 * [2025-03-28] Qingnang Smart Diagnosis - MedFlow All - Process Medical Framework published!
+* [2025-09-16] Update the web interface, support ASR and TTS.
 
 
 ##  1. Introduction
@@ -161,9 +161,37 @@ python3 inference.py --model <model_name> --model-url http://<openai ip>:<port>/
 
 **WebUI Interface Startup**
 
-```bash
-python3 inference_ui.py --host <server ip> --port <server port> --gradio-port <webui port> --model <model_name>
-```
+1. Install dependencies
+
+   ```
+   cd web
+   apt-get update && apt-get install npm mkcert
+   npm install --production
+   ```
+
+2. Generate CA
+
+   The parameter `${ip}` needs to be changed to the actual IP address.
+
+   ```
+   mkcert -key-file key.pem -cert-file cert.pem ${ip}
+   ```
+
+3. Start Server
+
+   Make sure that the inference service and the voice service have been started, and modify the `host`, `port`, `inferport` and `voiceport` parameters in the script. Then run:
+
+   ```
+   node server.js
+   ```
+
+> Note:
+>
+> The old interface can be launched by using the following command:
+>
+> ```
+> python3 inference_ui.py --host <server ip> --port <server port> --gradio-port <webui port> --model <model_name>
+> ```
 
 **4.3 Function Experience**
 
@@ -213,11 +241,18 @@ bash test followup.sh <server ip> <server port>
 
 You can open the URL prompted after starting the WebUI interface to experience the functions of each module:
 ```bash
-http://<webui ip>:<webui port>
+https://<webui ip>:<webui port>
 ```
-<div align="center">
-  <img src="./assets/webui.png">
-</div>
+
+![image-20250916151956339](assets/image-inquiry.png)
+
+![image-20250916152131215](assets/image-qualityInspect.png)
+
+![image-20250916152738651](assets/image-diagnosis.png)
+
+![image-20250916153658561](assets/image-therapy.png)
+
+
 
 ##  5. Statement of Agreement
 
