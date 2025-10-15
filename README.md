@@ -153,7 +153,7 @@ python3 create_database.py
 
 We also provide a function to customize quality inspection rules. For specific examples, please refer to the [quality_base.json](./data/raw/json/quality/quality_base.json) and [quality.json](./data/raw/json/quality/quality.json) file. The changes will take effect after you modify the file and restart the service.
 
-**Service Startup**
+**Inference Service Startup**
 
 ```bash
 python3 inference.py --model <model_name> --model-url http://<openai ip>:<port>/v1 --host <server ip> --port <server port> --max-tokens 4096
@@ -192,6 +192,16 @@ python3 inference.py --model <model_name> --model-url http://<openai ip>:<port>/
 > ```
 > python3 inference_ui.py --host <server ip> --port <server port> --gradio-port <webui port> --model <model_name>
 > ```
+
+**Real-time voice transcription**
+
+Start the real-time speech transcription server:
+
+```
+python3 realtime_voice.py
+```
+
+> Note: Modify parameters such as `--host`, `--model-path`, `--ssl-cert`, and `--ssl-key` according to the actual situation. For the test script, you can refer to [test-realtime_voice.py](./tests/test-realtime_voice.py).
 
 **4.3 Function Experience**
 

@@ -157,7 +157,7 @@ python3 create_database.py
 
 我们提供了自定义质检规则的功能，具体示例请参考[quality_base.json](./data/raw/json/quality/quality_base.json)和[quality.json](./data/raw/json/quality/quality.json)文件，修改重启即可生效。
 
-**服务启动**
+**推理服务启动**
 
 ```bash
 python3 inference.py --model <model_name> --model-url http://<openai ip>:<port>/v1 --host <server ip> --port <server port> --max-tokens 4096
@@ -196,6 +196,16 @@ python3 inference.py --model <model_name> --model-url http://<openai ip>:<port>/
 > ```bash
 > python3 inference_ui.py --host <server ip> --port <server port> --gradio-port <webui port> --model <model_name>
 > ```
+
+**语音实时转录**
+
+启动语音实时转录服务：
+
+```
+python3 realtime_voice.py
+```
+
+> 注意：根据实际情况修改`--host`、`--model-path`、`--ssl-cert`、`--ssl-key`等参数。测试脚本可参考 [test-realtime_voice.py](./tests/test-realtime_voice.py)
 
 **4.3  功能体验**
 
@@ -255,8 +265,6 @@ https://<webui ip>:<webui port>
 ![image-20250916152738651](assets/image-diagnosis.png)
 
 ![image-20250916153658561](assets/image-therapy.png)
-
-
 
 ##  5. Statement of Agreement
 

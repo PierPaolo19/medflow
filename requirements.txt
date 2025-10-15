@@ -23,3 +23,9 @@ shortuuid
 tiktoken
 uvicorn
 bs4
+funasr
+asr-decoder
+online-fbank
+loguru
+pysilero
+websockets
