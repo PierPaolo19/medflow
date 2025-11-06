@@ -207,8 +207,17 @@ python3 realtime_voice.py
 
 > 注意：根据实际情况修改`--host`、`--model-path`、`--ssl-cert`、`--ssl-key`等参数。测试脚本可参考 [test-realtime_voice.py](./tests/test-realtime_voice.py)
 
-**4.3  功能体验**
+**说话人识别**
 
+启动说话人识别服务：
+
+```
+python3 speaker_diarization.py
+```
+
+> 注意：根据实际情况修改`--host`、`--model-path`、`--sd-model-path`、`--ssl-cert`、`--ssl-key`等参数。测试脚本可参考 [test-speaker_diarization.py](./tests/test-speaker_diarization.py)
+
+**4.3  功能体验**
 
 **请求测试**
 

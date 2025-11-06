@@ -203,6 +203,16 @@ python3 realtime_voice.py
 
 > Note: Modify parameters such as `--host`, `--model-path`, `--ssl-cert`, and `--ssl-key` according to the actual situation. For the test script, you can refer to [test-realtime_voice.py](./tests/test-realtime_voice.py).
 
+**Speaker recognition**
+
+Start the speaker recognition service:
+
+```
+python3 speaker_diarization.py
+```
+
+> Note:Modify parameters such as `--host`, `--model-path`, `--sd-model-path`, `--ssl-cert`, and `--ssl-key` according to the actual situation. For the test script, you can refer to [test-speaker_diarization.py](./tests/test-speaker_diarization.py).
+
 **4.3 Function Experience**
 
 

@@ -36,7 +36,7 @@ def args_parser():
     parser.add_argument(
         "--model-path",
         type=str,
-        default="/home/workspace/models/SenseVoiceSmall",
+        default="/home/workspace/models/modelscope/hub/iic/SenseVoiceSmall/",
     )
     parser.add_argument("--ssl-cert", type=str, default="/home/workspace/ssl/cert.pem")
     parser.add_argument("--ssl-key", type=str, default="/home/workspace/ssl/key.pem")

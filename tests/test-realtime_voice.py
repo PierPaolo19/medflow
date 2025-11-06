@@ -1,17 +1,15 @@
 import asyncio
 import json
-import logging
+import ssl
 from pathlib import Path
 
 import websockets
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("transcription")
+from loguru import logger
 
 
-async def realtime_transcription(uri: str, audio_file: str = None):
+async def realtime_transcription(uri: str, audio_file: str = None, ssl_context=None):
     try:
-        async with websockets.connect(uri) as websocket:
+        async with websockets.connect(uri, ssl=ssl_context) as websocket:
             logger.info(f"Connected to WebSocket server: {uri}")
 
             if audio_file and Path(audio_file).exists():
@@ -54,6 +52,33 @@ if __name__ == "__main__":
     )
     parser.add_argument("--audio", default="./data/vad_example.wav")
 
+    parser.add_argument(
+        "--cert",
+        default="/home/workspace/ssl/cert.pem",
+        help="Path to SSL certificate file (.pem)",
+    )
+    parser.add_argument(
+        "--key",
+        default="/home/workspace/ssl/key.pem",
+        help="Path to SSL private key file (.pem)",
+    )
+
     args = parser.parse_args()
 
-    asyncio.run(realtime_transcription(args.uri, args.audio))
+    ssl_context = None
+    if args.cert and args.key:
+        try:
+            ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+            ssl_context.load_cert_chain(certfile=args.cert, keyfile=args.key)
+            logger.info("SSL context initialized with certificate and key")
+        except FileNotFoundError as e:
+            logger.error(f"SSL file not found: {e}")
+            exit(1)
+        except ssl.SSLError as e:
+            logger.error(f"SSL configuration error: {e}")
+            exit(1)
+    elif args.cert or args.key:
+        logger.error("Both --cert and --key must be provided for SSL")
+        exit(1)
+
+    asyncio.run(realtime_transcription(args.uri, args.audio, ssl_context))
