@@ -10,9 +10,9 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const host = '127.0.0.1';
-const port = 8081;
+const port = 5173;
 const inferport = 8013;
-const voiceport = 9000;
+const voiceport = 9007;
 
 app.use(express.static(path.join(__dirname, '')));
 

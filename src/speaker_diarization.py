@@ -31,8 +31,8 @@ def args_parser():
         type=str,
         default="/home/workspace/models/diar_streaming_sortformer_4spk-v2/diar_streaming_sortformer_4spk-v2.nemo",
     )
-    parser.add_argument("--ssl-cert", type=str, default="/home/workspace/ssl/cert.pem")
-    parser.add_argument("--ssl-key", type=str, default="/home/workspace/ssl/key.pem")
+    parser.add_argument("--ssl-cert", type=str, default="../web/cert.pem")
+    parser.add_argument("--ssl-key", type=str, default="../web/key.pem")
     parser.add_argument("--language", type=str, default="zh")
     parser.add_argument("--max-gap", type=float, default=1)
     parser.add_argument("--batch-size", type=float, default=128)
@@ -163,6 +163,8 @@ async def websocket_endpoint(
                 f.write(message["bytes"])
                 logger.info(f"Receive auido data: {len(message['bytes'])} bytes")
 
+    count = 0
+    is_final = False
     try:
         predicted_segments = diar_model.diarize(audio=temp_audio_path, batch_size=3)
         aduio_output = [seg.split(" ") for seg in predicted_segments[0]]
@@ -215,21 +217,21 @@ async def websocket_endpoint(
                 )
 
                 for i, (start_s, end_s, speaker, _) in enumerate(group):
+                    count += 1
+                    is_final = count == len(merged_segments)
                     res = batch_results[i]
                     text = rich_transcription_postprocess(res["text"])
                     logger.info(f"{speaker}: {text}")
 
                     response = TranscriptionEvent(
                         session_id=session_id,
-                        is_final=i == len(merged_segments) - 1,
+                        is_final=is_final,
                         start_at=start_s,
                         end_at=end_s,
                         spk_id=speaker,
                         text=text,
                     )
                     await websocket.send_json(response.model_dump())
-                    if response.is_final:
-                        await websocket.close(code=1008)
 
     except WebSocketDisconnect:
         logger.info(f"WebSocket disconnected ({session_id})")
@@ -242,6 +244,9 @@ async def websocket_endpoint(
                     os.remove(os.path.join(base_dir, filename))
                 except Exception as e:
                     logger.warning(f"Not Found: {filename} ({e})")
+
+        if is_final:
+            await websocket.close(code=1008)
 
         logger.info(f"Session {session_id} closed")
 

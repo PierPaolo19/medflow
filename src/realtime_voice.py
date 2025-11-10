@@ -38,8 +38,8 @@ def args_parser():
         type=str,
         default="/home/workspace/models/modelscope/hub/iic/SenseVoiceSmall/",
     )
-    parser.add_argument("--ssl-cert", type=str, default="/home/workspace/ssl/cert.pem")
-    parser.add_argument("--ssl-key", type=str, default="/home/workspace/ssl/key.pem")
+    parser.add_argument("--ssl-cert", type=str, default="../web/cert.pem")
+    parser.add_argument("--ssl-key", type=str, default="../web/key.pem")
     parser.add_argument("--device", type=str, default="cuda")
     parser.add_argument("--silerovad-version", type=str, default="v5")
     parser.add_argument("--samplerate", type=int, default=16000)

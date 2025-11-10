@@ -267,13 +267,17 @@ bash test followup.sh <server ip> <server port>
 https://<webui ip>:<webui port>
 ```
 
-![image-20250916151956339](assets/image-inquiry.png)
+![image-inquiry.png](assets/image-inquiry.png)
 
-![image-20250916152131215](assets/image-qualityInspect.png)
+![image-qualityInspect.png](assets/image-qualityInspect.png)
 
-![image-20250916152738651](assets/image-diagnosis.png)
+![image-diagnosis.png](assets/image-diagnosis.png)
 
-![image-20250916153658561](assets/image-therapy.png)
+![image-therapy.png](assets/image-therapy.png)
+
+![image-speaker-diarization.png](assets/image-speaker-diarization.png)
+
+
 
 ##  5. Statement of Agreement
 

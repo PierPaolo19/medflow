@@ -20,13 +20,14 @@ async def spk_transcriptions(uri: str, audio_file: str = None, ssl_context=None)
         ) as websocket:
             logger.info(f"Successfully connected to WebSocket server: {uri}")
 
+            chunk_size = 4 * 1024 * 1024
             with open(audio_file, "rb") as f:
-                audio_data = f.read()
-
-            await websocket.send(audio_data)
-            logger.info(
-                f"Audio data sent successfully: {audio_file} ({len(audio_data)} bytes)"
-            )
+                while True:
+                    chunk = f.read(chunk_size)
+                    logger.info(f"Audio data sent: {len(chunk)} bytes")
+                    if not chunk:
+                        break
+                    await websocket.send(chunk)
 
             await websocket.send("EOF")
             logger.info("EOF marker sent, waiting for responses")
@@ -76,12 +77,12 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--cert",
-        default="/home/workspace/ssl/cert.pem",
+        default="../web/cert.pem",
         help="Path to SSL certificate file (.pem)",
     )
     parser.add_argument(
         "--key",
-        default="/home/workspace/ssl/key.pem",
+        default="../web/key.pem",
         help="Path to SSL private key file (.pem)",
     )
 

@@ -54,12 +54,12 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--cert",
-        default="/home/workspace/ssl/cert.pem",
+        default="../web/cert.pem",
         help="Path to SSL certificate file (.pem)",
     )
     parser.add_argument(
         "--key",
-        default="/home/workspace/ssl/key.pem",
+        default="../web/key.pem",
         help="Path to SSL private key file (.pem)",
     )
 
