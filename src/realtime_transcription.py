@@ -76,8 +76,8 @@ class TranscriptionChunk(BaseModel):
     spk_id: int | None = None
 
 
-class TranscriptionResponse(BaseModel):
-    type: str = "TranscriptionResponse"
+class TranscriptionEvent(BaseModel):
+    type: str = "TranscriptionEvent"
     id: int
     begin_at: float
     end_at: float | None
@@ -130,7 +130,7 @@ async def websocket_endpoint(websocket: WebSocket):
     speech_count = 0
     current_audio_begin_time = 0.0
     asr_detected = False
-    transcription_response: TranscriptionResponse = None
+    transcription_response: TranscriptionEvent = None
     final_text = ""
     try:
         while True:
@@ -175,7 +175,7 @@ async def websocket_endpoint(websocket: WebSocket):
                             asr_detected = True
 
                         if asr_detected:
-                            transcription_response = TranscriptionResponse(
+                            transcription_response = TranscriptionEvent (
                                 id=speech_count,
                                 begin_at=current_audio_begin_time,
                                 end_at=None,

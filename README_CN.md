@@ -202,10 +202,10 @@ python3 inference.py --model <model_name> --model-url http://<openai ip>:<port>/
 启动语音实时转录服务：
 
 ```
-python3 realtime_voice.py
+python3 realtime_transcription.py
 ```
 
-> 注意：根据实际情况修改`--host`、`--model-path`、`--ssl-cert`、`--ssl-key`等参数。测试脚本可参考 [test-realtime_voice.py](./tests/test-realtime_voice.py)
+> 注意：根据实际情况修改`--host`、`--model-path`、`--ssl-cert`、`--ssl-key`等参数。测试脚本可参考 [test-realtime_transcription.py](./tests/test-realtime_transcription.py)
 
 **说话人识别**
 

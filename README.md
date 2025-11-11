@@ -198,10 +198,10 @@ python3 inference.py --model <model_name> --model-url http://<openai ip>:<port>/
 Start the real-time speech transcription server:
 
 ```
-python3 realtime_voice.py
+python3 realtime_transcription.py
 ```
 
-> Note: Modify parameters such as `--host`, `--model-path`, `--ssl-cert`, and `--ssl-key` according to the actual situation. For the test script, you can refer to [test-realtime_voice.py](./tests/test-realtime_voice.py).
+> Note: Modify parameters such as `--host`, `--model-path`, `--ssl-cert`, and `--ssl-key` according to the actual situation. For the test script, you can refer to [test-realtime_transcription.py](./tests/test-realtime_transcription.py).
 
 **Speaker recognition**
 
