@@ -36,16 +36,16 @@ def args_parser():
     parser.add_argument(
         "--model-path",
         type=str,
-        default="/home/workspace/models/SenseVoiceSmall",
+        default="/home/workspace/models/modelscope/hub/iic/SenseVoiceSmall/",
     )
-    parser.add_argument("--ssl-cert", type=str, default="/home/workspace/ssl/cert.pem")
-    parser.add_argument("--ssl-key", type=str, default="/home/workspace/ssl/key.pem")
+    parser.add_argument("--ssl-cert", type=str, default="../web/cert.pem")
+    parser.add_argument("--ssl-key", type=str, default="../web/key.pem")
     parser.add_argument("--device", type=str, default="cuda")
     parser.add_argument("--silerovad-version", type=str, default="v5")
     parser.add_argument("--samplerate", type=int, default=16000)
     parser.add_argument("--chunk-duration", type=float, default=0.1)
-    parser.add_argument("--vad-min-silence-duration-ms", type=int, default=950)
-    parser.add_argument("--vad-threshold", type=float, default=0.9)
+    parser.add_argument("--vad-min-silence-duration-ms", type=int, default=2000)
+    parser.add_argument("--vad-threshold", type=float, default=0.5)
     parser.add_argument("--language", type=str, default="zh")
     parser.add_argument("--textnorm", type=str, default=True)
 
@@ -76,8 +76,8 @@ class TranscriptionChunk(BaseModel):
     spk_id: int | None = None
 
 
-class TranscriptionResponse(BaseModel):
-    type: str = "TranscriptionResponse"
+class TranscriptionEvent(BaseModel):
+    type: str = "TranscriptionEvent"
     id: int
     begin_at: float
     end_at: float | None
@@ -130,7 +130,7 @@ async def websocket_endpoint(websocket: WebSocket):
     speech_count = 0
     current_audio_begin_time = 0.0
     asr_detected = False
-    transcription_response: TranscriptionResponse = None
+    transcription_response: TranscriptionEvent = None
     final_text = ""
     try:
         while True:
@@ -175,7 +175,7 @@ async def websocket_endpoint(websocket: WebSocket):
                             asr_detected = True
 
                         if asr_detected:
-                            transcription_response = TranscriptionResponse(
+                            transcription_response = TranscriptionEvent (
                                 id=speech_count,
                                 begin_at=current_audio_begin_time,
                                 end_at=None,
@@ -230,7 +230,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
 if __name__ == "__main__":
     uvicorn.run(
-        "realtime_voice:app",
+        "realtime_transcription:app",
         host=args.host,
         port=args.port,
         timeout_keep_alive=30,

@@ -198,10 +198,20 @@ python3 inference.py --model <model_name> --model-url http://<openai ip>:<port>/
 Start the real-time speech transcription server:
 
 ```
-python3 realtime_voice.py
+python3 realtime_transcription.py
 ```
 
-> Note: Modify parameters such as `--host`, `--model-path`, `--ssl-cert`, and `--ssl-key` according to the actual situation. For the test script, you can refer to [test-realtime_voice.py](./tests/test-realtime_voice.py).
+> Note: Modify parameters such as `--host`, `--model-path`, `--ssl-cert`, and `--ssl-key` according to the actual situation. For the test script, you can refer to [test-realtime_transcription.py](./tests/test-realtime_transcription.py).
+
+**Speaker recognition**
+
+Start the speaker recognition service:
+
+```
+python3 speaker_diarization.py
+```
+
+> Note:Modify parameters such as `--host`, `--model-path`, `--sd-model-path`, `--ssl-cert`, and `--ssl-key` according to the actual situation. For the test script, you can refer to [test-speaker_diarization.py](./tests/test-speaker_diarization.py).
 
 **4.3 Function Experience**
 
@@ -254,13 +264,15 @@ You can open the URL prompted after starting the WebUI interface to experience t
 https://<webui ip>:<webui port>
 ```
 
-![image-20250916151956339](assets/image-inquiry.png)
+![image-inquiry.png](assets/image-inquiry.png)
 
-![image-20250916152131215](assets/image-qualityInspect.png)
+![image-qualityInspect.png](assets/image-qualityInspect.png)
 
-![image-20250916152738651](assets/image-diagnosis.png)
+![image-diagnosis.png](assets/image-diagnosis.png)
 
-![image-20250916153658561](assets/image-therapy.png)
+![image-therapy.png](assets/image-therapy.png)
+
+![image-speaker-diarization.png](assets/image-speaker-diarization.png)
 
 
 

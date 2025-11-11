@@ -27,5 +27,6 @@ funasr
 asr-decoder
 online-fbank
 loguru
-pysilero
+pysilero==0.1.1
 websockets
+nemo-toolkit[all]

@@ -202,13 +202,22 @@ python3 inference.py --model <model_name> --model-url http://<openai ip>:<port>/
 启动语音实时转录服务：
 
 ```
-python3 realtime_voice.py
+python3 realtime_transcription.py
 ```
 
-> 注意：根据实际情况修改`--host`、`--model-path`、`--ssl-cert`、`--ssl-key`等参数。测试脚本可参考 [test-realtime_voice.py](./tests/test-realtime_voice.py)
+> 注意：根据实际情况修改`--host`、`--model-path`、`--ssl-cert`、`--ssl-key`等参数。测试脚本可参考 [test-realtime_transcription.py](./tests/test-realtime_transcription.py)
+
+**说话人识别**
+
+启动说话人识别服务：
+
+```
+python3 speaker_diarization.py
+```
+
+> 注意：根据实际情况修改`--host`、`--model-path`、`--sd-model-path`、`--ssl-cert`、`--ssl-key`等参数。测试脚本可参考 [test-speaker_diarization.py](./tests/test-speaker_diarization.py)
 
 **4.3  功能体验**
-
 
 **请求测试**
 
@@ -258,13 +267,17 @@ bash test followup.sh <server ip> <server port>
 https://<webui ip>:<webui port>
 ```
 
-![image-20250916151956339](assets/image-inquiry.png)
+![image-inquiry.png](assets/image-inquiry.png)
 
-![image-20250916152131215](assets/image-qualityInspect.png)
+![image-qualityInspect.png](assets/image-qualityInspect.png)
 
-![image-20250916152738651](assets/image-diagnosis.png)
+![image-diagnosis.png](assets/image-diagnosis.png)
 
-![image-20250916153658561](assets/image-therapy.png)
+![image-therapy.png](assets/image-therapy.png)
+
+![image-speaker-diarization.png](assets/image-speaker-diarization.png)
+
+
 
 ##  5. Statement of Agreement
 
