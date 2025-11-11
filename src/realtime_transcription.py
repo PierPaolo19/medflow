@@ -44,8 +44,8 @@ def args_parser():
     parser.add_argument("--silerovad-version", type=str, default="v5")
     parser.add_argument("--samplerate", type=int, default=16000)
     parser.add_argument("--chunk-duration", type=float, default=0.1)
-    parser.add_argument("--vad-min-silence-duration-ms", type=int, default=950)
-    parser.add_argument("--vad-threshold", type=float, default=0.9)
+    parser.add_argument("--vad-min-silence-duration-ms", type=int, default=2000)
+    parser.add_argument("--vad-threshold", type=float, default=0.5)
     parser.add_argument("--language", type=str, default="zh")
     parser.add_argument("--textnorm", type=str, default=True)
 
@@ -230,7 +230,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
 if __name__ == "__main__":
     uvicorn.run(
-        "realtime_voice:app",
+        "realtime_transcription:app",
         host=args.host,
         port=args.port,
         timeout_keep_alive=30,

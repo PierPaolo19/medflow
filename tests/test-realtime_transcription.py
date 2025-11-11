@@ -31,7 +31,7 @@ async def realtime_transcription(uri: str, audio_file: str = None, ssl_context=N
                 while True:
                     response = await asyncio.wait_for(websocket.recv(), timeout=10)
                     response = json.loads(response)
-                    if response["type"] == "TranscriptionResponse":
+                    if response["type"] == "TranscriptionEvent":
                         logger.info(
                             f"Received the transcription results: {response['data']['final_text']}"
                         )
