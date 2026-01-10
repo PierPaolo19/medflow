@@ -1,5 +1,6 @@
 <div align="center">
-<h1>
+This project is tested with BrowserStack.
+	<h1>
 Qingnang Smart Diagnosis - MedFlow All - Process Medical Framework
 </h1>
 
