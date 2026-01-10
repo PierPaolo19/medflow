@@ -2,12 +2,12 @@
 <h1>
 Qingnang Smart Diagnosis - MedFlow All - Process Medical Framework
 </h1>
-
+This project is tested with BrowserStack.
 </div>
 
 <div align="center">
 
-    This project is tested with BrowserStack.
+
   <a href="code_license">
     <img alt="Code License" src="https://img.shields.io/badge/Apache%202.0%20-green?style=flat&label=Code%20License&link=#"/>
   </a>
