@@ -2,7 +2,7 @@
 <h1>
 Qingnang Smart Diagnosis - MedFlow All - Process Medical Framework
 </h1>
-This project is tested with BrowserStack.
+g
 </div>
 
 <div align="center">
